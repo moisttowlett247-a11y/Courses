@@ -2,13 +2,13 @@ import { Track } from '../types/curriculum';
 
 export const backendTracks: Track[] = [
   // ==========================================
-  // 🟢 EASY / BEGINNER TIER (ZERO CODING KNOWLEDGE REQUIRED)
+  // 🟢 EASY / BEGINNER TIER (ABSOLUTELY ZERO PRIOR CODING KNOWLEDGE)
   // ==========================================
   {
     id: 'track-zero-to-one',
-    title: 'Python for Absolute Beginners',
-    tagline: 'Start here if you have never written a single line of code in your life!',
-    description: 'Learn the core building blocks of programming from scratch using friendly analogies: variables, math, conditions, functions, and lists.',
+    title: 'Coding for Absolute Beginners',
+    tagline: 'Start here if you have never seen or written a single line of code!',
+    description: 'Learn to code using simple everyday analogies: cooking recipes, labeled jars, light switches, and kitchen blenders. Zero jargon!',
     icon: 'Sparkles',
     accentColor: '#10B981', // Emerald
     tier: 'beginner',
@@ -16,401 +16,337 @@ export const backendTracks: Track[] = [
       {
         id: 'course-py-zero',
         trackId: 'track-zero-to-one',
-        title: 'Level 1: The First Steps of a Coder',
-        description: 'No prior experience required. Learn how computers read instructions line by line.',
+        title: 'Level 0: What is Code?',
+        description: 'Take your very first steps. No math skills or tech background needed.',
         iconName: 'BookOpen',
         language: 'python',
         level: 'Novice',
         tier: 'beginner',
         totalXp: 350,
-        estimatedHours: 2,
+        estimatedHours: 1,
         lessons: [
           {
-            id: 'beg-01-print',
+            id: 'beg-00-what-is-code',
             trackId: 'track-zero-to-one',
             courseId: 'course-py-zero',
-            title: 'Your First Spell: Printing Output',
-            slug: 'beginner-print-output',
+            title: '1. What is Code? (The Cooking Recipe)',
+            slug: 'beginner-what-is-code',
             difficulty: 'Novice',
             tier: 'beginner',
             language: 'python',
             xpReward: 30,
+            readTimeMinutes: 2,
+            theoryMarkdown: `### What is Code? (Don't Panic!)
+
+You do not need to be a math genius to code. 
+
+**Code is just a cooking recipe for a computer.**
+
+Think about baking cookies:
+1. Turn on oven to 350°F.
+2. Mix flour, sugar, and chocolate chips.
+3. Bake for 12 minutes.
+
+A computer does the exact same thing: it reads instructions **from top to bottom**, one line at a time!
+
+#### Your First Mission:
+Look at the code on the right. You don't need to change anything yet! Just click the glowing **"Run Code"** button (or press \`Ctrl+Enter\`) to run your first computer program!`,
+            instructions: [
+              "Look at the code on the right side of the screen.",
+              "Click the glowing 'Run Code' button at the top right.",
+              "Watch the computer follow your recipe and pass the test!"
+            ],
+            starterCode: `# This is your very first Python recipe!
+# Lines starting with '#' are friendly notes for humans.
+# The computer ignores them.
+
+def start_adventure():
+    # 'return' means "hand this finished answer back"
+    return "I am now a programmer!"
+`,
+            solutionCode: `def start_adventure():
+    return "I am now a programmer!"
+`,
+            testCases: [
+              {
+                id: 'beg-z1',
+                name: 'start_adventure() hands back your success message',
+                inputDescription: 'start_adventure()',
+                expectedOutput: 'I am now a programmer!'
+              }
+            ],
+            hints: [
+              "You don't need to change any code for this first lesson!",
+              "Just click the 'Run Code' button at the top right to claim your first XP!"
+            ]
+          },
+          {
+            id: 'beg-01-print',
+            trackId: 'track-zero-to-one',
+            courseId: 'course-py-zero',
+            title: '2. Words & Text (Why Quotes Matter)',
+            slug: 'beginner-words-quotes',
+            difficulty: 'Novice',
+            tier: 'beginner',
+            language: 'python',
+            xpReward: 35,
             readTimeMinutes: 3,
-            theoryMarkdown: `### Welcome to Coding, Adventurer!
+            theoryMarkdown: `### Teaching the Computer to Read Words
 
-When you write code, you are simply giving a computer a list of step-by-step instructions.
+Computers are great with numbers, but when we want them to handle words (like names, messages, or dialogue), we must wrap the text in **quotes** \`"..."\`.
 
-In Python, the most basic command is \`print()\`. It displays text on your terminal screen.
+In coding, text inside quotes is called a **String** (because it's a string of characters tied together).
 
 \`\`\`python
-print("Hello Adventurer!")
+"Hello World!" # The computer treats this as readable text
 \`\`\`
 
-#### How it works:
-1. \`print\` is a built-in Python command (a **function**).
-2. The parentheses \`()\` mean "run this command with the contents inside".
-3. The quotes \`"..."\` tell Python this is raw text (known in programming as a **String**).`,
+#### Why do we need quotes?
+- If you write \`"cat"\` (with quotes), the computer knows you mean the animal word "cat".
+- If you write \`cat\` (without quotes), the computer thinks you are trying to run a secret computer command named cat!`,
             instructions: [
-              "Write a function named `say_hello()`.",
-              "Inside the function, return the text string `\"Hello Adventurer!\"` exactly.",
-              "Run your code and watch the test pass!"
+              "Change the message in the code to say `\"Welcome to the Guild!\"` (make sure it's inside the quotes).",
+              "Click 'Run Code' to test your answer."
             ],
-            starterCode: `# Type your first Python code below:
-def say_hello():
-    # Return the text "Hello Adventurer!"
-    return "Hello Adventurer!"
+            starterCode: `def guild_welcome():
+    # Change "Change this text" to "Welcome to the Guild!"
+    return "Change this text"
 `,
-            solutionCode: `def say_hello():
-    return "Hello Adventurer!"
+            solutionCode: `def guild_welcome():
+    return "Welcome to the Guild!"
 `,
             testCases: [
               {
                 id: 'beg-t1',
-                name: 'say_hello() == "Hello Adventurer!"',
-                inputDescription: 'say_hello()',
-                expectedOutput: 'Hello Adventurer!'
+                name: 'guild_welcome() == "Welcome to the Guild!"',
+                inputDescription: 'guild_welcome()',
+                expectedOutput: 'Welcome to the Guild!'
               }
             ],
             hints: [
-              "Make sure you include double quotes around the text: `\"Hello Adventurer!\"`",
-              "Spelling and punctuation matter! Ensure the exclamation mark is inside the quotes."
+              "Keep the quotes! Your code should look like: `return \"Welcome to the Guild!\"`",
+              "Make sure the spelling and punctuation match exactly."
             ]
           },
           {
             id: 'beg-02-variables',
             trackId: 'track-zero-to-one',
             courseId: 'course-py-zero',
-            title: 'Variables: Labeled Boxes in Memory',
-            slug: 'beginner-variables-boxes',
+            title: '3. Variables (Labeled Jars on a Shelf)',
+            slug: 'beginner-variables-jars',
             difficulty: 'Novice',
             tier: 'beginner',
             language: 'python',
             xpReward: 40,
-            readTimeMinutes: 4,
+            readTimeMinutes: 3,
             theoryMarkdown: `### What is a Variable?
 
-Think of a **variable** as a cardboard storage box with a label on the front. You can put numbers, text, or values inside it, and reference it later by name!
+Imagine your kitchen counter has glass jars with sticky labels on them:
+- Jar labeled **\`gold\`** $\to$ you put \`50\` inside it.
+- Jar labeled **\`hero_name\`** $\to$ you put \`"Boots"\` inside it.
+
+Whenever you want to know what's in the jar, you just use its name!
 
 \`\`\`python
-player_name = "Kaelen"
-gold_coins = 50
+hero_name = "Boots"
+gold = 50
 \`\`\`
 
-Here, \`player_name\` holds a text string, while \`gold_coins\` holds an integer number.
-
-#### Combining Strings & Numbers
-You can combine (concatenate) text and variables easily:
-\`\`\`python
-health = 100
-status = f"Player health is {health} HP"
-\`\`\``,
+In Python, the \`=\` sign means **"put the value on the right into the jar on the left"**.`,
             instructions: [
-              "Write a function `create_character_status(hero_name, level)`.",
-              "It should return a status string: `\"Hero: <hero_name> | Level: <level>\"`.",
-              "Example: `create_character_status(\"Boots\", 5)` should return `\"Hero: Boots | Level: 5\"`."
+              "Create a variable named `player_health` and set it equal to `100`.",
+              "Return `player_health` at the end of the function."
             ],
-            starterCode: `def create_character_status(hero_name, level):
-    # TODO: Combine hero_name and level into the status string
-    pass
+            starterCode: `def get_starting_health():
+    # TODO: Create a jar named player_health with 100 inside
+    player_health = 100
+    return player_health
 `,
-            solutionCode: `def create_character_status(hero_name, level):
-    return f"Hero: {hero_name} | Level: {level}"
+            solutionCode: `def get_starting_health():
+    player_health = 100
+    return player_health
 `,
             testCases: [
               {
-                id: 'beg-t2',
-                name: 'create_character_status("Boots", 5)',
-                inputDescription: 'hero_name="Boots", level=5',
-                expectedOutput: 'Hero: Boots | Level: 5'
-              },
-              {
-                id: 'beg-t2-2',
-                name: 'create_character_status("Kael", 10)',
-                inputDescription: 'hero_name="Kael", level=10',
-                expectedOutput: 'Hero: Kael | Level: 10'
+                id: 'beg-v1',
+                name: 'get_starting_health() returns 100',
+                inputDescription: 'get_starting_health()',
+                expectedOutput: 100
               }
             ],
             hints: [
-              "Use an f-string: `f\"Hero: {hero_name} | Level: {level}\"`",
-              "Make sure the spacing matches `Hero: <name> | Level: <lvl>`."
+              "Write `player_health = 100`",
+              "Then write `return player_health`"
             ]
           },
           {
             id: 'beg-03-math',
             trackId: 'track-zero-to-one',
             courseId: 'course-py-zero',
-            title: 'Simple Math & Damage Calculation',
-            slug: 'beginner-math-operators',
+            title: '4. Everyday Math (+ and -)',
+            slug: 'beginner-everyday-math',
             difficulty: 'Novice',
             tier: 'beginner',
             language: 'python',
             xpReward: 40,
             readTimeMinutes: 3,
-            theoryMarkdown: `### Coding Arithmetic
+            theoryMarkdown: `### Simple Math with Code
 
-Computers are lightning-fast calculators. Python has built-in math operators:
-- \`+\` : Addition (\`5 + 3 = 8\`)
-- \`-\` : Subtraction (\`10 - 4 = 6\`)
-- \`*\` : Multiplication (\`6 * 7 = 42\`)
-- \`/\` : Division (\`10 / 2 = 5.0\`)
+Coding math works just like a pocket calculator:
+- \`+\` : Adds numbers together (\`10 + 5 = 15\`)
+- \`-\` : Subtracts numbers (\`20 - 5 = 15\`)
+- \`*\` : Multiplies numbers (\`4 * 5 = 20\`)
 
 \`\`\`python
-base_damage = 20
-bonus = 5
-total = base_damage + bonus # 25
+starting_gold = 50
+quest_reward = 25
+total_gold = starting_gold + quest_reward # 75
 \`\`\``,
             instructions: [
-              "Write a function `calculate_loot_split(total_gold, number_of_party_members)`.",
-              "It should return the integer division amount each member gets (e.g. `total_gold // number_of_party_members`).",
-              "Example: `calculate_loot_split(100, 4)` should return `25`."
+              "Write a function `buy_health_potion(current_gold, potion_cost)`.",
+              "Subtract `potion_cost` from `current_gold` and return the remaining gold."
             ],
-            starterCode: `def calculate_loot_split(total_gold, number_of_party_members):
-    # TODO: Calculate how much gold each member receives
+            starterCode: `def buy_health_potion(current_gold, potion_cost):
+    # TODO: Calculate remaining gold (current_gold minus potion_cost)
     pass
 `,
-            solutionCode: `def calculate_loot_split(total_gold, number_of_party_members):
-    return int(total_gold / number_of_party_members)
+            solutionCode: `def buy_health_potion(current_gold, potion_cost):
+    return current_gold - potion_cost
 `,
             testCases: [
               {
                 id: 'beg-m1',
-                name: 'calculate_loot_split(100, 4) == 25',
-                inputDescription: 'total_gold=100, members=4',
-                expectedOutput: 25
+                name: 'buy_health_potion(50, 15) == 35',
+                inputDescription: 'current_gold=50, potion_cost=15',
+                expectedOutput: 35
               },
               {
                 id: 'beg-m2',
-                name: 'calculate_loot_split(90, 3) == 30',
-                inputDescription: 'total_gold=90, members=3',
-                expectedOutput: 30
+                name: 'buy_health_potion(100, 40) == 60',
+                inputDescription: 'current_gold=100, potion_cost=40',
+                expectedOutput: 60
               }
             ],
             hints: [
-              "Divide `total_gold` by `number_of_party_members` using `int(total_gold / number_of_party_members)` or `total_gold // number_of_party_members`."
+              "Return `current_gold - potion_cost`"
             ]
           },
           {
             id: 'beg-04-conditions',
             trackId: 'track-zero-to-one',
             courseId: 'course-py-zero',
-            title: 'Making Decisions: If / Else Logic',
-            slug: 'beginner-if-else-conditions',
+            title: '5. Making Decisions (If / Else)',
+            slug: 'beginner-if-else-decisions',
             difficulty: 'Novice',
             tier: 'beginner',
             language: 'python',
-            xpReward: 50,
-            readTimeMinutes: 5,
-            theoryMarkdown: `### Teaching the Computer How to Choose
+            xpReward: 45,
+            readTimeMinutes: 4,
+            theoryMarkdown: `### Teaching the Computer to Choose
 
-Programs become powerful when they can make decisions based on changing conditions using \`if\` and \`else\`.
+Think of how you make decisions in everyday life:
+- **IF** the traffic light is green $\to$ drive forward.
+- **ELSE** $\to$ stop your car.
+
+In Python, we write this using \`if\` and \`else\`:
 
 \`\`\`python
-player_hp = 0
+keys_in_pocket = 1
 
-if player_hp > 0:
-    print("Player is alive and fighting!")
+if keys_in_pocket > 0:
+    return "Door Unlocked!"
 else:
-    print("Player has fallen in battle!")
+    return "Door Locked!"
 \`\`\`
 
-#### Comparison Symbols:
-- \`>\` : Greater than
-- \`<\` : Less than
-- \`==\` : Is equal to (double equals checks equality!)
-- \`>=\` : Greater than or equal to`,
+The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater than 0, so the door unlocks!`,
             instructions: [
-              "Write a function `can_enter_dungeon(player_level, required_level)`.",
-              "If `player_level` is greater than or equal to `required_level`, return `True`.",
-              "Otherwise, return `False`."
+              "Write a function `check_player_status(health)`.",
+              "IF `health > 0`, return `\"Player is Alive!\"`.",
+              "ELSE, return `\"Player has Defeated!\"`."
             ],
-            starterCode: `def can_enter_dungeon(player_level, required_level):
-    # TODO: Compare levels and return True or False
-    pass
-`,
-            solutionCode: `def can_enter_dungeon(player_level, required_level):
-    if player_level >= required_level:
-        return True
+            starterCode: `def check_player_status(health):
+    # TODO: Check if health is greater than 0
+    if health > 0:
+        return "Player is Alive!"
     else:
-        return False
+        return "Player has Defeated!"
+`,
+            solutionCode: `def check_player_status(health):
+    if health > 0:
+        return "Player is Alive!"
+    else:
+        return "Player has Defeated!"
 `,
             testCases: [
               {
                 id: 'beg-c1',
-                name: 'can_enter_dungeon(10, 5) == True',
-                inputDescription: 'player_level=10, required_level=5',
-                expectedOutput: true
+                name: 'check_player_status(50) == "Player is Alive!"',
+                inputDescription: 'health=50',
+                expectedOutput: 'Player is Alive!'
               },
               {
                 id: 'beg-c2',
-                name: 'can_enter_dungeon(2, 5) == False',
-                inputDescription: 'player_level=2, required_level=5',
-                expectedOutput: false
+                name: 'check_player_status(0) == "Player has Defeated!"',
+                inputDescription: 'health=0',
+                expectedOutput: 'Player has Defeated!'
               }
             ],
             hints: [
-              "Use: `if player_level >= required_level: return True`",
-              "Add: `else: return False`"
+              "Use: `if health > 0:` and `else:`"
             ]
           },
           {
-            id: 'beg-05-lists',
+            id: 'beg-05-functions',
             trackId: 'track-zero-to-one',
             courseId: 'course-py-zero',
-            title: 'Lists: Managing Your Adventurer Inventory',
-            slug: 'beginner-lists-inventory',
+            title: '6. Functions (The Magic Blender Button)',
+            slug: 'beginner-functions-blender',
             difficulty: 'Novice',
             tier: 'beginner',
             language: 'python',
             xpReward: 50,
             readTimeMinutes: 4,
-            theoryMarkdown: `### Working with Collections of Items
+            theoryMarkdown: `### What is a Function?
 
-Instead of creating separate variables for every single item, we store collections in a **List**.
+Think of a kitchen blender.
+1. You put strawberries inside (**Input / Parameter**).
+2. You press the BLEND button (**The Function**).
+3. Delicious strawberry smoothie pours out (**Output / Return**).
+
+Instead of rebuilding the blender from scratch every morning, you just press the button!
 
 \`\`\`python
-inventory = ["Wooden Sword", "Health Potion", "Torch"]
+# We define our recipe once:
+def make_smoothie(fruit):
+    return f"Fresh {fruit} Smoothie!"
 
-# Adding an item:
-inventory.append("Shield")
-
-# Checking how many items we have:
-count = len(inventory) # 4
-\`\`\`
-
-Lists keep items in ordered sequence, starting at index \`0\`!`,
+# Now we can make as many as we want!
+glass1 = make_smoothie("Mango")
+glass2 = make_smoothie("Berry")
+\`\`\``,
             instructions: [
-              "Write a function `add_item_to_bag(bag, new_item)`.",
-              "Add `new_item` to the `bag` list using `.append()`.",
-              "Return the updated `bag` list."
+              "Write a function named `cast_fireball(spell_power)`.",
+              "It should return the text: `\"Casting Fireball with <spell_power> power!\"`.",
+              "Example: `cast_fireball(50)` should return `\"Casting Fireball with 50 power!\"`."
             ],
-            starterCode: `def add_item_to_bag(bag, new_item):
-    # TODO: Append new_item to bag and return bag
-    pass
+            starterCode: `def cast_fireball(spell_power):
+    # TODO: Combine the text and spell_power
+    return f"Casting Fireball with {spell_power} power!"
 `,
-            solutionCode: `def add_item_to_bag(bag, new_item):
-    bag.append(new_item)
-    return bag
+            solutionCode: `def cast_fireball(spell_power):
+    return f"Casting Fireball with {spell_power} power!"
 `,
             testCases: [
               {
-                id: 'beg-l1',
-                name: 'add_item_to_bag(["Sword"], "Shield")',
-                inputDescription: 'bag=["Sword"], new_item="Shield"',
-                expectedOutput: ["Sword", "Shield"]
+                id: 'beg-f1',
+                name: 'cast_fireball(50) returns formatted spell text',
+                inputDescription: 'spell_power=50',
+                expectedOutput: 'Casting Fireball with 50 power!'
               }
             ],
             hints: [
-              "Call `bag.append(new_item)` then `return bag`."
-            ]
-          }
-        ]
-      },
-      {
-        id: 'course-sql-zero',
-        trackId: 'track-zero-to-one',
-        title: 'Beginner SQL: Talking to Databases',
-        description: 'Learn how to retrieve and filter data from spreadsheet-like database tables.',
-        iconName: 'Database',
-        language: 'sql',
-        level: 'Novice',
-        tier: 'beginner',
-        totalXp: 200,
-        estimatedHours: 2,
-        lessons: [
-          {
-            id: 'beg-sql-01',
-            trackId: 'track-zero-to-one',
-            courseId: 'course-sql-zero',
-            title: 'Your First Database Query: SELECT *',
-            slug: 'beginner-sql-select',
-            difficulty: 'Novice',
-            tier: 'beginner',
-            language: 'sql',
-            xpReward: 50,
-            readTimeMinutes: 3,
-            interactiveType: 'sql',
-            theoryMarkdown: `### What is a Database?
-
-A database is like a super-fast spreadsheet stored on a server.
-- Each spreadsheet is called a **Table** (e.g. \`users\`, \`orders\`).
-- Each row represents a single person or item.
-- Each column represents a piece of information (e.g. \`name\`, \`role\`, \`age\`).
-
-To ask the database for information, we write **SQL (Structured Query Language)**:
-
-\`\`\`sql
-SELECT * FROM users;
-\`\`\`
-
-The \`*\` means "give me ALL columns".`,
-            instructions: [
-              "Write a query to retrieve all columns from the `users` table.",
-              "Run the query and inspect the tabular output!"
-            ],
-            starterCode: `-- Write your first query below:
-SELECT * FROM users;
-`,
-            solutionCode: `SELECT * FROM users;
-`,
-            testCases: [
-              {
-                id: 'bsql-t1',
-                name: 'SELECT * FROM users returns all records',
-                expectedOutput: 'Valid relational result set'
-              }
-            ],
-            hints: [
-              "Simply write `SELECT * FROM users;` and click 'Run Code'!"
-            ]
-          },
-          {
-            id: 'beg-sql-02',
-            trackId: 'track-zero-to-one',
-            courseId: 'course-sql-zero',
-            title: 'Filtering Rows with WHERE',
-            slug: 'beginner-sql-where',
-            difficulty: 'Novice',
-            tier: 'beginner',
-            language: 'sql',
-            xpReward: 60,
-            readTimeMinutes: 4,
-            interactiveType: 'sql',
-            theoryMarkdown: `### Finding Specific Records
-
-What if you only want to find users who are older than 30? We use the \`WHERE\` keyword:
-
-\`\`\`sql
-SELECT name, age, role
-FROM users
-WHERE age > 30;
-\`\`\`
-
-This filters out anyone 30 or younger, returning only matching rows.`,
-            instructions: [
-              "Write a SQL query that selects `name`, `role`, and `age` from `users`.",
-              "Only include users where `age > 30`.",
-              "Order by `age DESC` (oldest first)."
-            ],
-            starterCode: `-- Select users older than 30
-SELECT name, role, age
-FROM users
-WHERE age > 30
-ORDER BY age DESC;
-`,
-            solutionCode: `SELECT name, role, age
-FROM users
-WHERE age > 30
-ORDER BY age DESC;
-`,
-            testCases: [
-              {
-                id: 'bsql-t2',
-                name: 'Filter users where age > 30',
-                expectedOutput: 'Valid relational result set'
-              }
-            ],
-            hints: [
-              "Make sure you include `WHERE age > 30` before `ORDER BY age DESC`."
+              "Use an f-string: `return f\"Casting Fireball with {spell_power} power!\"`"
             ]
           }
         ]
@@ -419,7 +355,7 @@ ORDER BY age DESC;
   },
 
   // ==========================================
-  // 🟡 MEDIUM / INTERMEDIATE TIER (BACKEND ARCHITECTURE)
+  // 🟡 MEDIUM / INTERMEDIATE TIER (BACKEND SYSTEMS & APPLICATION LOGIC)
   // ==========================================
   {
     id: 'track-python',
@@ -427,7 +363,7 @@ ORDER BY age DESC;
     tagline: 'Object-oriented patterns, data models, error middleware, and rate limiters',
     description: 'Bridge basic coding into real-world backend applications with clean classes and resilient error handling.',
     icon: 'Terminal',
-    accentColor: '#38BDF8', // Cyan/Sky
+    accentColor: '#38BDF8',
     tier: 'intermediate',
     courses: [
       {
@@ -557,9 +493,9 @@ class RateLimiter:
   },
   {
     id: 'track-sql',
-    title: 'SQL Relational JOINs & Aggregations',
-    tagline: 'Connect tables, multi-table queries, and calculate analytics metrics',
-    description: 'Master relational schema modeling, foreign keys, INNER JOINs, and GROUP BY reports.',
+    title: 'SQL Relational Databases & Queries',
+    tagline: 'Spreadsheets on steroids: connect tables and calculate metrics',
+    description: 'Learn how to query, filter, join, and aggregate structured data.',
     icon: 'Database',
     accentColor: '#10B981',
     tier: 'intermediate',
@@ -590,7 +526,7 @@ class RateLimiter:
             interactiveType: 'sql',
             theoryMarkdown: `### Connecting Normalized Tables
 
-Relational databases split data across multiple tables. An **INNER JOIN** connects matching rows using primary and foreign keys:
+Relational databases split data across multiple tables. An **INNER JOIN** connects matching rows:
 
 \`\`\`sql
 SELECT users.name, orders.product, orders.amount
@@ -632,7 +568,7 @@ ORDER BY orders.amount DESC;
     id: 'track-linux-git',
     title: 'Linux Shell & Terminal Pipelines',
     tagline: 'Master Unix command pipes, log filtering with grep, and process control',
-    description: 'The terminal is the home of backend developers. Learn pipes, streams, and grep.',
+    description: 'The terminal is the command center for backend engineers. Learn pipes and grep.',
     icon: 'TerminalSquare',
     accentColor: '#EC4899',
     tier: 'intermediate',
