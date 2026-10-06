@@ -2,6 +2,8 @@ export type ProgrammingLanguage = 'python' | 'go' | 'sql' | 'bash' | 'docker' | 
 
 export type Difficulty = 'Novice' | 'Apprentice' | 'Adept' | 'Master' | 'Legendary';
 
+export type TierLevel = 'beginner' | 'intermediate' | 'advanced';
+
 export interface TestCase {
   id: string;
   name: string;
@@ -17,6 +19,7 @@ export interface LessonContent {
   title: string;
   slug: string;
   difficulty: Difficulty;
+  tier: TierLevel;
   language: ProgrammingLanguage;
   xpReward: number;
   readTimeMinutes: number;
@@ -38,6 +41,7 @@ export interface Course {
   iconName: string;
   language: ProgrammingLanguage;
   level: Difficulty;
+  tier: TierLevel;
   totalXp: number;
   estimatedHours: number;
   lessons: LessonContent[];
@@ -51,6 +55,7 @@ export interface Track {
   description: string;
   icon: string;
   accentColor: string;
+  tier: TierLevel;
   courses: Course[];
 }
 

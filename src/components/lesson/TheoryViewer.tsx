@@ -30,12 +30,20 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
     <div className="flex flex-col h-full overflow-y-auto p-5 text-slate-200 space-y-6">
       {/* Title & Metadata */}
       <div>
-        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1.5">
+        <div className="flex items-center gap-2 text-xs text-slate-400 mb-1.5 flex-wrap">
+          <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] ${
+            lesson.tier === 'beginner' 
+              ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40' 
+              : lesson.tier === 'intermediate'
+              ? 'bg-sky-950/80 text-sky-300 border border-sky-500/40'
+              : 'bg-rose-950/80 text-rose-300 border border-rose-500/40'
+          }`}>
+            {lesson.tier === 'beginner' ? '🟢 Beginner' : lesson.tier === 'intermediate' ? '🟡 Medium' : '🔴 Hard'}
+          </span>
+          <span aria-hidden="true">·</span>
           <span className="uppercase tracking-wider font-semibold text-amber-400 font-mono">
             {lesson.language}
           </span>
-          <span aria-hidden="true">·</span>
-          <span>{lesson.difficulty}</span>
           <span aria-hidden="true">·</span>
           <span>{lesson.readTimeMinutes} min read</span>
           <span aria-hidden="true">·</span>
@@ -44,6 +52,11 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
         <h1 className="text-xl font-bold tracking-tight text-white">
           {lesson.title}
         </h1>
+        {lesson.tier === 'beginner' && (
+          <p className="text-[11px] text-emerald-400/90 mt-1 font-sans">
+            🌱 <strong>Beginner Friendly</strong> — No prior coding experience required. We explain everything from first principles!
+          </p>
+        )}
       </div>
 
       {/* Markdown Theory Content */}

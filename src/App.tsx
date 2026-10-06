@@ -237,6 +237,7 @@ export default function App() {
       title: quest.title,
       slug: 'custom-quest',
       difficulty: quest.difficulty || 'Adept',
+      tier: quest.tier || 'intermediate',
       language: quest.language || 'python',
       xpReward: quest.xpReward || 120,
       readTimeMinutes: 5,
