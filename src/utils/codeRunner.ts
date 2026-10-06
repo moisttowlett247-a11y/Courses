@@ -227,17 +227,16 @@ export async function runInteractiveCode(
 
     if (language === 'python') {
       // Python simulated sandbox compiler
-      // We translate core Python constructs or execute via sandboxed JS eval with Python runtime shim
       const pyRuntime = `
         const print = mockConsole.log;
-        const len = (x) => (x ? x.length || Object.keys(x).length : 0);
+        const len = (x) => (x ? (x.length !== undefined ? x.length : Object.keys(x).length) : 0);
         const range = (start, stop, step = 1) => {
           if (stop === undefined) { stop = start; start = 0; }
           const arr = [];
           for (let i = start; step > 0 ? i < stop : i > stop; i += step) arr.push(i);
           return arr;
         };
-        const sum = (arr) => arr.reduce((a, b) => a + b, 0);
+        const sum = (arr) => Array.isArray(arr) ? arr.reduce((a, b) => a + b, 0) : 0;
         const max = (...arr) => Math.max(...arr.flat());
         const min = (...arr) => Math.min(...arr.flat());
         const abs = Math.abs;
@@ -248,18 +247,26 @@ export async function runInteractiveCode(
         const True = true;
         const False = false;
         const None = null;
+
+        // Python string & object helpers
+        if (!String.prototype.upper) String.prototype.upper = function() { return this.toUpperCase(); };
+        if (!String.prototype.lower) String.prototype.lower = function() { return this.toLowerCase(); };
+        if (!String.prototype.strip) String.prototype.strip = function() { return this.trim(); };
       `;
 
       // Convert common Python syntax to JS for immediate browser evaluation
-      let jsCode = userCode
-        .replace(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\):/g, 'function $1($2) {')
-        .replace(/class\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?:/g, 'class $1 {')
-        .replace(/elif\s+(.*?):/g, '} else if ($1) {')
-        .replace(/if\s+(.*?):/g, 'if ($1) {')
-        .replace(/else:/g, '} else {')
-        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\):/g, 'for (let $1 of range($2)) {')
-        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?):/g, 'for (let $1 of $2) {')
-        .replace(/while\s+(.*?):/g, 'while ($1) {')
+      let jsCode = userCode;
+
+      // Handle Python comments
+      jsCode = jsCode.replace(/#.*$/gm, '//');
+
+      // Handle Python f-strings: f"hello {name}" -> `hello ${name}`
+      jsCode = jsCode.replace(/f(["'])([\s\S]*?)\1/g, (_, q, content) => {
+        return '`' + content.replace(/\{([^{}]+)\}/g, '${$1}') + '`';
+      });
+
+      // Handle Python keywords and operators
+      jsCode = jsCode
         .replace(/\bNone\b/g, 'null')
         .replace(/\bTrue\b/g, 'true')
         .replace(/\bFalse\b/g, 'false')
@@ -269,8 +276,19 @@ export async function runInteractiveCode(
         .replace(/self\./g, 'this.')
         .replace(/__init__\s*\(this,?\s*/g, 'constructor(')
         .replace(/__str__\s*\(this\)/g, 'toString()')
-        .replace(/#.*$/gm, '//')
         .replace(/\.append\(/g, '.push(');
+
+      // Handle Python block headers
+      jsCode = jsCode
+        .replace(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\):/g, 'function $1($2) {')
+        .replace(/class\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?:/g, 'class $1 {')
+        .replace(/elif\s+(.*?):/g, '} else if ($1) {')
+        .replace(/if\s+(.*?):/g, 'if ($1) {')
+        .replace(/else:/g, '} else {')
+        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\):/g, 'for (let $1 of range($2)) {')
+        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?):/g, 'for (let $1 of $2) {')
+        .replace(/while\s+(.*?):/g, 'while ($1) {')
+        .replace(/^\s*pass\s*$/gm, '/* pass */');
 
       // Auto-close open braces based on indentation or heuristic
       const openCount = (jsCode.match(/\{/g) || []).length;
@@ -279,14 +297,15 @@ export async function runInteractiveCode(
         jsCode += '\n' + '}'.repeat(openCount - closeCount);
       }
 
-      // Execute code inside isolated scope
-      const sandboxFn = new Function('mockConsole', `${pyRuntime}\n${jsCode}\nreturn { ...this };`);
-      let scope: any = {};
+      // Check for top-level syntax/compilation errors
+      let hasCompileError = false;
+      let compileErrorMsg = '';
       try {
-        scope = sandboxFn.call({}, mockConsole) || {};
-      } catch (compileErr: any) {
-        // Fallback execution
-        logs.push(`Runtime log: Executing Python script...`);
+        const testCompile = new Function('mockConsole', `${pyRuntime}\n${jsCode}`);
+        testCompile(mockConsole);
+      } catch (err: any) {
+        hasCompileError = true;
+        compileErrorMsg = err.message || 'Syntax error in code';
       }
 
       // Run against test cases
@@ -295,44 +314,104 @@ export async function runInteractiveCode(
         let actual: any = null;
         let errStr: string | undefined = undefined;
 
+        if (hasCompileError) {
+          return {
+            id: tc.id || `test-${idx}`,
+            name: tc.name || `Assertion ${idx + 1}`,
+            passed: false,
+            input: tc.inputDescription || '',
+            expected: tc.expectedOutput,
+            actual: `SyntaxError: ${compileErrorMsg}`,
+            error: compileErrorMsg
+          };
+        }
+
         try {
-          // If function call is specified in testCase
-          if (tc.name && tc.name.includes('(')) {
-            const fnCall = tc.name;
-            const evalFn = new Function('mockConsole', `${pyRuntime}\n${jsCode}\ntry { return ${fnCall}; } catch(e){ return "ERR: " + e.message; }`);
-            actual = evalFn(mockConsole);
-          } else {
-            // Find main function defined in code
-            const fnNameMatch = userCode.match(/def\s+([a-zA-Z0-9_]+)/);
-            if (fnNameMatch && typeof scope[fnNameMatch[1]] === 'function') {
-              const fn = scope[fnNameMatch[1]];
-              const args = Array.isArray(tc.input) ? tc.input : [tc.input];
-              actual = fn(...args);
-            } else {
-              actual = logs[logs.length - 1] || 'Code executed';
+          // Extract the function call expression accurately
+          let callExpression = '';
+          let fnName = '';
+
+          // 1. Check if tc.inputDescription contains a function call like foo(...)
+          if (tc.inputDescription) {
+            const descMatch = tc.inputDescription.trim().match(/^([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)$/);
+            if (descMatch) {
+              fnName = descMatch[1];
+              callExpression = `${fnName}(${descMatch[2]})`;
             }
           }
 
-          // Evaluate pass/fail
-          if (typeof tc.expectedOutput === 'object' && tc.expectedOutput !== null) {
-            passed = JSON.stringify(actual) === JSON.stringify(tc.expectedOutput);
-          } else {
-            passed = String(actual).trim() === String(tc.expectedOutput).trim();
+          // 2. Check if tc.name contains a function call like foo(...)
+          if (!callExpression && tc.name) {
+            const nameMatch = tc.name.match(/([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)/);
+            if (nameMatch) {
+              fnName = nameMatch[1];
+              callExpression = `${fnName}(${nameMatch[2]})`;
+            }
           }
 
-          // Heuristic fallback if code matches solution logic
-          if (!passed && solutionCode && userCode.length > 20) {
-            const hasKeyLogic = solutionCode.split('\n')
-              .filter(l => l.trim().length > 5 && !l.includes('def') && !l.includes('#'))
-              .some(l => userCode.includes(l.trim()));
-            if (hasKeyLogic && (!actual || actual === 'Code executed')) {
+          // 3. Check function defined in userCode if still no call found
+          if (!callExpression) {
+            const defMatch = userCode.match(/def\s+([a-zA-Z0-9_]+)/);
+            if (defMatch) {
+              fnName = defMatch[1];
+              if (tc.input !== undefined) {
+                const argsStr = Array.isArray(tc.input)
+                  ? tc.input.map((a: any) => JSON.stringify(a)).join(', ')
+                  : JSON.stringify(tc.input);
+                callExpression = `${fnName}(${argsStr})`;
+              } else {
+                callExpression = `${fnName}()`;
+              }
+            }
+          }
+
+          // Execute function call if identified
+          if (callExpression && fnName) {
+            const runnerBody = `
+              ${pyRuntime}
+              ${jsCode}
+              if (typeof ${fnName} === 'function') {
+                return ${callExpression};
+              }
+              return undefined;
+            `;
+            const runnerFn = new Function('mockConsole', runnerBody);
+            actual = runnerFn(mockConsole);
+          } else {
+            // Top-level prints or script execution
+            actual = logs.length > 0 ? logs[logs.length - 1] : 'Code executed';
+          }
+
+          // If function returned nothing, but printed to console, check if output was logged
+          if (actual === undefined && logs.length > 0) {
+            actual = logs[logs.length - 1];
+          }
+
+          // Evaluate pass / fail
+          if (typeof tc.expectedOutput === 'object' && tc.expectedOutput !== null) {
+            passed = JSON.stringify(actual) === JSON.stringify(tc.expectedOutput);
+          } else if (typeof tc.expectedOutput === 'number') {
+            passed = Number(actual) === Number(tc.expectedOutput);
+          } else if (typeof tc.expectedOutput === 'boolean') {
+            passed = Boolean(actual) === Boolean(tc.expectedOutput);
+          } else {
+            const actStr = String(actual !== undefined && actual !== null ? actual : '').trim();
+            const expStr = String(tc.expectedOutput ?? '').trim();
+            passed = actStr === expStr || logs.some(l => l.trim() === expStr);
+          }
+
+          // Heuristic solution fallback
+          if (!passed && solutionCode) {
+            const normUser = userCode.replace(/#[^\n]*/g, '').replace(/\s+/g, ' ').trim();
+            const normSol = solutionCode.replace(/#[^\n]*/g, '').replace(/\s+/g, ' ').trim();
+            if (normUser.includes(normSol) || normSol.includes(normUser)) {
               passed = true;
               actual = tc.expectedOutput;
             }
           }
         } catch (e: any) {
           errStr = e.message;
-          actual = `Exception: ${e.message}`;
+          actual = `Runtime Exception: ${e.message}`;
         }
 
         return {
@@ -341,7 +420,7 @@ export async function runInteractiveCode(
           passed,
           input: tc.inputDescription || (typeof tc.input === 'object' ? JSON.stringify(tc.input) : String(tc.input || '')),
           expected: tc.expectedOutput,
-          actual,
+          actual: actual !== undefined ? actual : 'None',
           error: errStr
         };
       });

@@ -44,7 +44,7 @@ export const bugChallenges: BugChallenge[] = [
     scenario: 'The vault inventory system was supposed to calculate total gold for all 4 party members, but it accidentally skips the last adventurer!',
     brokenCode: `def sum_party_gold(gold_list):
     total = 0
-    # BUG: range(len(gold_list) - 1) stops before the last person!
+    # Sum each member's gold in the inventory
     for i in range(len(gold_list) - 1):
         total += gold_list[i]
     return total
@@ -55,7 +55,7 @@ export const bugChallenges: BugChallenge[] = [
         total += gold_list[i]
     return total
 `,
-    bugHint: 'Look at line 4: `range(len(gold_list) - 1)` drops the last index. Change it to `range(len(gold_list))` or simply `for gold in gold_list:`!',
+    bugHint: 'Look closely at the loop boundaries. Python lists are 0-indexed. Does the range calculation cover every index in gold_list, or does it stop one item early?',
     testCases: [
       {
         id: 'bug-t3',
@@ -82,7 +82,7 @@ FROM users
 JOIN orders ON users.id = orders.user_id
 WHERE orders.status = 'completed';
 `,
-    bugHint: 'When using JOIN, you must specify how the two tables connect using `ON users.id = orders.user_id`!',
+    bugHint: 'When joining two relational tables, how does the SQL engine know which user corresponds to which order? Look up how to connect tables via an ON clause with foreign keys.',
     testCases: [
       {
         id: 'bug-t4',
@@ -106,7 +106,6 @@ func DistributeTasks(numbers []int) int {
     for _, n := range numbers {
         ch <- n
     }
-    // BUG: Missing close(ch)! The loop below will wait forever!
 
     total := 0
     for val := range ch {
@@ -131,7 +130,7 @@ func DistributeTasks(numbers []int) int {
     return total
 }
 `,
-    bugHint: 'When a receiver loops over a channel with `for val := range ch`, the channel MUST be closed with `close(ch)` so the loop knows when to stop!',
+    bugHint: 'A "for val := range ch" loop will continuously block and wait for incoming messages forever unless the channel is explicitly closed. What Go function signals that sending is complete?',
     testCases: [
       {
         id: 'bug-t5',

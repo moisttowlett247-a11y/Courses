@@ -39,12 +39,12 @@ export const certificationExams: CertificationExam[] = [
         question: 'Why does Python require quotation marks ("...") around words like "Hello"?',
         codeSnippet: `message = "Hello"`,
         options: [
-          'Quotes make the text look fancy.',
           'Quotes tell the computer: "This is normal human text, do not try to run it as a computer command."',
+          'Quotes make the text look fancy.',
           'The computer will run out of battery without quotes.',
           'Quotes turn the words into numbers.'
         ],
-        correctIndex: 1,
+        correctIndex: 0,
         simpleExplanation: 'Without quotes, the computer searches for a secret program or command named Hello. Quotes tell it: "Relax, this is just plain text to read."'
       },
       {
@@ -55,11 +55,11 @@ bonus = 15
 total = gold + bonus`,
         options: [
           '5',
-          '35',
           '2015',
+          '35',
           'None'
         ],
-        correctIndex: 1,
+        correctIndex: 2,
         simpleExplanation: 'Python does standard math! 20 + 15 = 35. The single equal sign (=) stores the result 35 into the jar labeled "total".'
       },
       {
@@ -72,11 +72,11 @@ total = gold + bonus`,
         return "Game Over"`,
         options: [
           '"Alive"',
-          '"Game Over"',
           '0',
-          'Error: player_hp cannot be zero'
+          'Error: player_hp cannot be zero',
+          '"Game Over"'
         ],
-        correctIndex: 1,
+        correctIndex: 3,
         simpleExplanation: 'Because 0 is NOT strictly greater than 0, the "if" test fails! The computer jumps directly to the "else" branch and returns "Game Over".'
       },
       {
@@ -84,12 +84,12 @@ total = gold + bonus`,
         question: 'How do you add a new item into an existing list in Python?',
         codeSnippet: `backpack = ["Torch", "Bread"]`,
         options: [
-          'backpack.push_in("Shield")',
           'backpack.append("Shield")',
+          'backpack.push_in("Shield")',
           'backpack + "Shield"',
           'add(backpack, "Shield")'
         ],
-        correctIndex: 1,
+        correctIndex: 0,
         simpleExplanation: 'In Python, lists have a built-in helper called .append(). Think of "appending" as putting another item into the bottom of your backpack.'
       },
       {
@@ -97,11 +97,11 @@ total = gold + bonus`,
         question: 'What is a "Variable" in programming?',
         options: [
           'A computer virus that changes passwords.',
-          'A labeled storage container in computer memory that holds a piece of information.',
           'A button that changes the screen color.',
+          'A labeled storage container in computer memory that holds a piece of information.',
           'A special math formula only scientists use.'
         ],
-        correctIndex: 1,
+        correctIndex: 2,
         simpleExplanation: 'A variable is just a sticky label on a jar. If you label a jar "coins" and put 50 in it, coins = 50!'
       },
       {
@@ -123,11 +123,11 @@ print(f"Level {lvl}")`,
         question: 'What does the double equals sign (==) mean in code compared to a single equals sign (=)?',
         options: [
           '= checks equality, while == creates a variable.',
-          '= puts a value into a variable, while == checks if two things are equal to each other.',
           'They are completely identical and do the exact same thing.',
-          '== multiplies by 2.'
+          '== multiplies by 2.',
+          '= puts a value into a variable, while == checks if two things are equal to each other.'
         ],
-        correctIndex: 1,
+        correctIndex: 3,
         simpleExplanation: 'Crucial beginner rule: single (=) means "store this value". Double (==) means "ask: are these two things equal?"'
       }
     ]
@@ -180,12 +180,12 @@ print(f"Level {lvl}")`,
         id: 'sql-q3',
         question: 'Which SQL keyword lets you connect two separate tables together using a matching ID?',
         options: [
-          'MERGE_EVERYTHING',
           'JOIN',
+          'MERGE_EVERYTHING',
           'COMBINE',
           'ATTACH'
         ],
-        correctIndex: 1,
+        correctIndex: 0,
         simpleExplanation: 'JOIN is the superpower of relational databases. It lets you link orders to users based on user_id = users.id!'
       },
       {
@@ -206,11 +206,11 @@ print(f"Level {lvl}")`,
         question: 'What will the query "SELECT COUNT(*) FROM orders;" return?',
         options: [
           'The total money spent on all orders combined.',
-          'The total number of rows (orders) in the table.',
           'The first order only.',
-          'A list of all customer names.'
+          'A list of all customer names.',
+          'The total number of rows (orders) in the table.'
         ],
-        correctIndex: 1,
+        correctIndex: 3,
         simpleExplanation: 'COUNT(*) counts the rows! If there are 42 orders placed, it will return the single number 42.'
       },
       {
@@ -218,12 +218,12 @@ print(f"Level {lvl}")`,
         question: 'If you want results ordered from highest price to lowest price, what keyword do you use?',
         codeSnippet: `SELECT product, price FROM items ORDER BY price DESC;`,
         options: [
-          'ORDER BY price ASC',
           'ORDER BY price DESC',
+          'ORDER BY price ASC',
           'SORT BY price HIGH',
           'REVERSE price'
         ],
-        correctIndex: 1,
+        correctIndex: 0,
         simpleExplanation: 'DESC stands for "Descending" (starting from top/biggest down to lowest). ASC stands for "Ascending" (1, 2, 3...).'
       }
     ]
@@ -279,11 +279,11 @@ print(f"Level {lvl}")`,
         question: 'What is the primary rule of Go concurrency?',
         options: [
           '"Always share memory using complex locks and global variables."',
-          '"Do not communicate by sharing memory; instead, share memory by communicating (using channels)."',
           '"Never use more than 1 CPU core."',
+          '"Do not communicate by sharing memory; instead, share memory by communicating (using channels)."',
           '"Only run programs at night."'
         ],
-        correctIndex: 1,
+        correctIndex: 2,
         simpleExplanation: 'This is the golden motto of Go! Instead of multiple workers grabbing the same shared memory box and fighting, they send messages safely through channels.'
       },
       {
@@ -293,11 +293,11 @@ print(f"Level {lvl}")`,
 msg := <-messages`,
         options: [
           '=>',
-          '<-',
           '++',
-          '~>'
+          '~>',
+          '<-'
         ],
-        correctIndex: 1,
+        correctIndex: 3,
         simpleExplanation: 'The arrow (<-) points in the direction data is flowing! "ch <- data" sends into channel; "var := <-ch" takes data out of channel.'
       }
     ]
@@ -336,12 +336,12 @@ msg := <-messages`,
         id: 'mast-q2',
         question: 'Why do high-traffic systems place a Redis cache in front of their SQL database?',
         options: [
-          'To hide the database from the government.',
           'Because Redis stores hot data in ultra-fast RAM, answering reads in ~1 millisecond and protecting the disk database from crashing.',
+          'To hide the database from the government.',
           'Redis is cheaper than buying electricity.',
           'SQL databases cannot store numbers.'
         ],
-        correctIndex: 1,
+        correctIndex: 0,
         simpleExplanation: 'RAM memory is 1,000x faster than disk! A Redis cache intercepts 90% of requests instantly, so your database doesn\'t melt down under peak traffic.'
       },
       {
@@ -349,11 +349,11 @@ msg := <-messages`,
         question: 'What is a "Circuit Breaker" pattern in backend microservices?',
         options: [
           'A physical switch on the server rack that flips during power surges.',
-          'Software logic that automatically stops sending requests to a failing service to prevent cascading crashes across the entire system.',
           'A code tool that speeds up Python.',
+          'Software logic that automatically stops sending requests to a failing service to prevent cascading crashes across the entire system.',
           'A way to delete slow users.'
         ],
-        correctIndex: 1,
+        correctIndex: 2,
         simpleExplanation: 'Just like the breaker box in your house cuts power before wires catch fire, a software circuit breaker stops sending traffic to a crashing service so the rest of the app stays alive!'
       },
       {
@@ -361,11 +361,11 @@ msg := <-messages`,
         question: 'What is a "Deadlock" in concurrent backend systems?',
         options: [
           'When a computer permanently runs out of hard drive space.',
-          'When two or more processes each hold a lock the other needs, causing both to wait forever in an unmoving freeze.',
           'When an internet cable is unplugged.',
-          'When a password is forgotten.'
+          'When a password is forgotten.',
+          'When two or more processes each hold a lock the other needs, causing both to wait forever in an unmoving freeze.'
         ],
-        correctIndex: 1,
+        correctIndex: 3,
         simpleExplanation: 'Imagine two people trying to cross a narrow hallway: person A won\'t move until person B moves, and person B won\'t move until person A moves. Neither can move forever!'
       }
     ]

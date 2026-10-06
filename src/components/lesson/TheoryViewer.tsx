@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LessonContent } from '../../types/curriculum';
 import { jargonDictionary, JargonTerm } from '../../data/jargonData';
 import { BookOpen, CheckCircle2, HelpCircle, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp, BookA, X, AlertTriangle, Lightbulb, Code2 } from 'lucide-react';
@@ -20,12 +20,23 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
   onOpenAIHint
 }) => {
   const [showSolution, setShowSolution] = useState(false);
+  const [confirmReveal, setConfirmReveal] = useState(false);
   const [showJargonModal, setShowJargonModal] = useState(false);
   const [showEli5, setShowEli5] = useState(true);
-  const [showBreakdown, setShowBreakdown] = useState(true);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const [selectedQuizOption, setSelectedQuizOption] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [checkedInstructions, setCheckedInstructions] = useState<number[]>([]);
+
+  // Automatically hide solutions and breakdowns when switching lessons
+  useEffect(() => {
+    setShowSolution(false);
+    setConfirmReveal(false);
+    setShowBreakdown(false);
+    setSelectedQuizOption(null);
+    setQuizAnswered(false);
+    setCheckedInstructions([]);
+  }, [lesson.id]);
 
   const toggleInstruction = (idx: number) => {
     playSound('key');
@@ -149,16 +160,16 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
 
       {/* Line-by-Line Code Breakdown */}
       {lesson.codeBreakdown && lesson.codeBreakdown.length > 0 && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-2.5">
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-3.5 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-              <Code2 className="h-4 w-4 text-sky-400" /> Line-by-Line Code Breakdown
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Code2 className="h-4 w-4 text-sky-400" /> Syntax Pattern Guide
             </span>
             <button
               onClick={() => setShowBreakdown(!showBreakdown)}
-              className="text-[11px] text-slate-400 hover:text-slate-200"
+              className="text-[11px] text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
             >
-              {showBreakdown ? 'Collapse' : 'Expand'}
+              {showBreakdown ? 'Hide Syntax Guide' : 'Need a Syntax Clue? (Hidden)'}
             </button>
           </div>
 
@@ -315,20 +326,62 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
           );
         })}
 
-        {/* Reveal Solution */}
+        {/* Reveal Solution Protected */}
         <div className="pt-2">
-          <button
-            onClick={() => setShowSolution(!showSolution)}
-            className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1.5 transition-colors"
-          >
-            {showSolution ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-            {showSolution ? 'Hide Solution' : 'Stuck? Show Correct Answer'}
-          </button>
-
-          {showSolution && (
-            <div className="mt-2 rounded-md border border-rose-900/40 bg-rose-950/20 p-3 font-mono text-xs text-slate-200 overflow-x-auto">
-              <div className="text-[10px] text-rose-400 uppercase font-sans mb-1 font-bold">Answer & Solution</div>
-              <pre>{lesson.solutionCode}</pre>
+          {!showSolution ? (
+            <div>
+              {!confirmReveal ? (
+                <button
+                  onClick={() => setConfirmReveal(true)}
+                  className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                  Stuck? Need to Peek at the Answer?
+                </button>
+              ) : (
+                <div className="p-3 rounded-lg border border-amber-500/30 bg-amber-950/20 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-300">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+                    <span>Challenge Guard: Try hints or the memory stepper first!</span>
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Real coding confidence comes from figuring out the problem. Are you sure you want to reveal the full solution code?
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      onClick={() => setConfirmReveal(false)}
+                      className="px-2.5 py-1 text-xs rounded bg-slate-800 text-slate-300 hover:bg-slate-700 cursor-pointer"
+                    >
+                      Keep Trying
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSolution(true);
+                        setConfirmReveal(false);
+                      }}
+                      className="px-2.5 py-1 text-xs rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30 cursor-pointer"
+                    >
+                      Reveal Answer Key
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <button
+                  onClick={() => setShowSolution(false)}
+                  className="text-xs text-slate-500 hover:text-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <EyeOff className="h-3.5 w-3.5" />
+                  Hide Solution
+                </button>
+              </div>
+              <div className="rounded-md border border-rose-900/40 bg-rose-950/20 p-3 font-mono text-xs text-slate-200 overflow-x-auto">
+                <div className="text-[10px] text-rose-400 uppercase font-sans mb-1 font-bold">Answer & Solution Key</div>
+                <pre>{lesson.solutionCode}</pre>
+              </div>
             </div>
           )}
         </div>

@@ -38,8 +38,8 @@ export const backendTracks: Track[] = [
             readTimeMinutes: 2,
             eli5Summary: 'A computer is like a super-fast puppy: it has zero imagination, but it will follow your exact step-by-step instructions from top to bottom!',
             codeBreakdown: [
-              { code: 'def start_adventure():', simpleMeaning: 'Tells Python: "I am creating a new recipe named start_adventure".' },
-              { code: 'return "I am now a programmer!"', simpleMeaning: '"return" means: hand this finished sentence back to whoever asked for it.' }
+              { code: 'def recipe_name():', simpleMeaning: 'Tells Python: "I am creating a reusable set of instructions called recipe_name".' },
+              { code: 'return "result text"', simpleMeaning: '"return" hands the finished answer back to whoever asked for it.' }
             ],
             commonMistakes: [
               'Deleting the colon (:) at the end of the line. In Python, colons are required at the end of recipe headers!',
@@ -48,11 +48,11 @@ export const backendTracks: Track[] = [
             quickCheckQuiz: {
               question: 'What does a computer do when it runs your code?',
               options: [
-                'It follows every line of instruction from top to bottom like a recipe.',
-                'It guesses what you wanted even if there are spelling errors.',
+                'It guesses what you meant even if words are misspelled.',
+                'It follows every line of instruction from top to bottom in exact order.',
                 'It closes all open apps.'
               ],
-              correctIndex: 0,
+              correctIndex: 1,
               explanation: 'Computers are literal machines. They follow your instructions step-by-step in exact sequence!'
             },
             theoryMarkdown: `### What is Code? (Don't Panic!)
@@ -68,20 +68,28 @@ Think about baking cookies:
 
 A computer does the exact same thing: it reads instructions **from top to bottom**, one line at a time!
 
+#### How Functions Hand Back Answers
+When your code finishes a task, it uses the special keyword **\`return\`** to hand the finished result back:
+
+\`\`\`python
+def bake_cookies():
+    return "Fresh chocolate chip cookies ready!"
+\`\`\`
+
 #### Your First Mission:
-Look at the code on the right. You don't need to change anything yet! Just click the glowing **"Run Code"** button (or press \`Ctrl+Enter\`) to run your first computer program!`,
+Write a return statement inside \`start_adventure()\` that hands back the exact guild motto: \`"I am now a programmer!"\`. Then click **"Run Code"** to verify your answer!`,
             instructions: [
-              "Look at the code on the right side of the screen.",
-              "Click the glowing 'Run Code' button at the top right.",
-              "Watch the computer follow your recipe and pass the test!"
+              "Inside the `start_adventure()` function, write a `return` statement.",
+              "Return the exact text message: `\"I am now a programmer!\"` (wrapped in quotes).",
+              "Click 'Run Code' to test your answer!"
             ],
-            starterCode: `# This is your very first Python recipe!
-# Lines starting with '#' are friendly notes for humans.
-# The computer ignores them.
+            starterCode: `# Your First Coding Mission!
+# Complete the function below to return your graduation motto:
+# "I am now a programmer!"
 
 def start_adventure():
-    # 'return' means "hand this finished answer back"
-    return "I am now a programmer!"
+    # Type your return statement here (remember to indent with 4 spaces):
+    pass
 `,
             solutionCode: `def start_adventure():
     return "I am now a programmer!"
@@ -95,8 +103,8 @@ def start_adventure():
               }
             ],
             hints: [
-              "You don't need to change any code for this first lesson!",
-              "Just click the 'Run Code' button at the top right to claim your first XP!"
+              "Remember the `return` keyword hands back results. Your line should begin with `return`.",
+              "Wrap the message in quotation marks, matching the letters and punctuation exactly: `\"I am now a programmer!\"`"
             ]
           },
           {
@@ -112,8 +120,8 @@ def start_adventure():
             readTimeMinutes: 3,
             eli5Summary: 'Putting text in quotes is like writing a label on a cardboard box. Without quotes, the computer thinks you are typing a secret computer command!',
             codeBreakdown: [
-              { code: 'def guild_welcome():', simpleMeaning: 'Defines a recipe called guild_welcome.' },
-              { code: 'return "Welcome to the Guild!"', simpleMeaning: 'Hands back the greeting wrapped in safe quotation marks.' }
+              { code: '"Your text here"', simpleMeaning: 'Quotation marks protect human words so Python treats them as readable text (a String).' },
+              { code: 'return "Greeting"', simpleMeaning: 'Hands back the string safely.' }
             ],
             commonMistakes: [
               'Mixing different quotes like "Hello\' (start with double quotes, finish with double quotes!).',
@@ -122,11 +130,11 @@ def start_adventure():
             quickCheckQuiz: {
               question: 'Why do words in code need quotation marks ("...") around them?',
               options: [
-                'To tell the computer: "This is human reading text, do not treat it as a command."',
                 'Because quotes make the computer speakers louder.',
-                'To make words italic.'
+                'To make words italic on the screen.',
+                'To tell the computer: "This is human reading text, do not treat it as an executable command."'
               ],
-              correctIndex: 0,
+              correctIndex: 2,
               explanation: 'Quotes are protective shields that tell the computer: "Treat this as pure text, do not try to execute it as computer code".'
             },
             theoryMarkdown: `### Teaching the Computer to Read Words
@@ -136,19 +144,23 @@ Computers are great with numbers, but when we want them to handle words (like na
 In coding, text inside quotes is called a **String** (because it's a string of characters tied together).
 
 \`\`\`python
-"Hello World!" # The computer treats this as readable text
+# Example of strings:
+hero_title = "Knight of the Realm"
+battle_cry = "For honor!"
 \`\`\`
 
 #### Why do we need quotes?
 - If you write \`"cat"\` (with quotes), the computer knows you mean the animal word "cat".
-- If you write \`cat\` (without quotes), the computer thinks you are trying to run a secret computer command named cat!`,
+- If you write \`cat\` (without quotes), the computer searches for a secret computer command or variable named cat!`,
             instructions: [
-              "Change the message in the code to say `\"Welcome to the Guild!\"` (make sure it's inside the quotes).",
+              "Make the `guild_welcome()` function return the greeting `\"Welcome to the Guild!\"`.",
+              "Make sure your text is wrapped in quotes and includes the exclamation mark.",
               "Click 'Run Code' to test your answer."
             ],
             starterCode: `def guild_welcome():
-    # Change "Change this text" to "Welcome to the Guild!"
-    return "Change this text"
+    # Mission: Return the greeting message: "Welcome to the Guild!"
+    # Replace pass with your return statement:
+    pass
 `,
             solutionCode: `def guild_welcome():
     return "Welcome to the Guild!"
@@ -162,8 +174,8 @@ In coding, text inside quotes is called a **String** (because it's a string of c
               }
             ],
             hints: [
-              "Keep the quotes! Your code should look like: `return \"Welcome to the Guild!\"`",
-              "Make sure the spelling and punctuation match exactly."
+              "Remember that all text strings in Python must start and end with matching quotation marks.",
+              "Double check your capitalization, spacing, and the exclamation mark at the end."
             ]
           },
           {
@@ -179,8 +191,8 @@ In coding, text inside quotes is called a **String** (because it's a string of c
             readTimeMinutes: 3,
             eli5Summary: 'A variable is like sticking a label on a jar on your kitchen counter. If you write "gold" on the label and put 50 in, the jar remembers it!',
             codeBreakdown: [
-              { code: 'player_health = 100', simpleMeaning: 'Creates a container labeled "player_health" and puts the number 100 inside.' },
-              { code: 'return player_health', simpleMeaning: 'Takes the 100 out of the jar and hands it back.' }
+              { code: 'box_name = 100', simpleMeaning: 'Creates a storage spot named box_name and puts the value 100 inside.' },
+              { code: 'return box_name', simpleMeaning: 'Retrieves the value from that storage spot and hands it back.' }
             ],
             commonMistakes: [
               'Putting the value on the left side (e.g. 100 = player_health). The jar name MUST always be on the left!',
@@ -199,25 +211,27 @@ In coding, text inside quotes is called a **String** (because it's a string of c
             theoryMarkdown: `### What is a Variable?
 
 Imagine your kitchen counter has glass jars with sticky labels on them:
-- Jar labeled **\`gold\`** $\to$ you put \`50\` inside it.
+- Jar labeled **\`mana_potions\`** $\to$ you put \`5\` inside it.
 - Jar labeled **\`hero_name\`** $\to$ you put \`"Boots"\` inside it.
 
 Whenever you want to know what's in the jar, you just use its name!
 
 \`\`\`python
-hero_name = "Boots"
-gold = 50
+# Example: storing items in memory jars
+player_mana = 50
+companion_name = "Shadow"
 \`\`\`
 
 In Python, the \`=\` sign means **"put the value on the right into the jar on the left"**.`,
             instructions: [
-              "Create a variable named `player_health` and set it equal to `100`.",
+              "Inside `get_starting_health()`, create a variable named `player_health` and set it equal to `100`.",
               "Return `player_health` at the end of the function."
             ],
             starterCode: `def get_starting_health():
-    # TODO: Create a jar named player_health with 100 inside
-    player_health = 100
-    return player_health
+    # Mission:
+    # 1. Create a variable named player_health with the number 100 stored in it
+    # 2. Return player_health
+    pass
 `,
             solutionCode: `def get_starting_health():
     player_health = 100
@@ -232,8 +246,8 @@ In Python, the \`=\` sign means **"put the value on the right into the jar on th
               }
             ],
             hints: [
-              "Write `player_health = 100`",
-              "Then write `return player_health`"
+              "Remember: the container name goes on the left of `=`, and the value goes on the right.",
+              "Numbers don't need quotes: assign the raw integer 100, then return the variable name on the next line."
             ]
           },
           {
@@ -249,8 +263,8 @@ In Python, the \`=\` sign means **"put the value on the right into the jar on th
             readTimeMinutes: 3,
             eli5Summary: 'Math in code is as easy as typing on your phone calculator: + adds coins together, and - subtracts what you spend at the shop!',
             codeBreakdown: [
-              { code: 'def buy_health_potion(current_gold, potion_cost):', simpleMeaning: 'A recipe that accepts your current gold and the cost of the potion.' },
-              { code: 'return current_gold - potion_cost', simpleMeaning: 'Subtracts the cost and hands back your remaining balance.' }
+              { code: 'total = a - b', simpleMeaning: 'Subtracts b from a and saves the difference into total.' },
+              { code: 'return total', simpleMeaning: 'Hands back the calculated result.' }
             ],
             commonMistakes: [
               'Calculating the math but forgetting to write "return". Without return, the computer keeps the answer to itself!'
@@ -258,11 +272,11 @@ In Python, the \`=\` sign means **"put the value on the right into the jar on th
             quickCheckQuiz: {
               question: 'If you have 50 gold and buy an item for 15 gold, how does Python calculate your change?',
               options: [
-                'current_gold - item_cost',
                 'current_gold + item_cost',
+                'current_gold - item_cost',
                 'current_gold / item_cost'
               ],
-              correctIndex: 0,
+              correctIndex: 1,
               explanation: 'Minus (-) subtracts the cost from your current money, leaving you with 35 gold.'
             },
             theoryMarkdown: `### Simple Math with Code
@@ -273,16 +287,18 @@ Coding math works just like a pocket calculator:
 - \`*\` : Multiplies numbers (\`4 * 5 = 20\`)
 
 \`\`\`python
-starting_gold = 50
-quest_reward = 25
-total_gold = starting_gold + quest_reward # 75
+# Example: computing remaining stamina
+starting_stamina = 100
+sprint_cost = 30
+remaining = starting_stamina - sprint_cost  # 70
 \`\`\``,
             instructions: [
-              "Write a function `buy_health_potion(current_gold, potion_cost)`.",
-              "Subtract `potion_cost` from `current_gold` and return the remaining gold."
+              "Complete the function `buy_health_potion(current_gold, potion_cost)`.",
+              "Subtract `potion_cost` from `current_gold`.",
+              "Return the remaining gold."
             ],
             starterCode: `def buy_health_potion(current_gold, potion_cost):
-    # TODO: Calculate remaining gold (current_gold minus potion_cost)
+    # Mission: Subtract potion_cost from current_gold and return the remaining amount
     pass
 `,
             solutionCode: `def buy_health_potion(current_gold, potion_cost):
@@ -303,7 +319,8 @@ total_gold = starting_gold + quest_reward # 75
               }
             ],
             hints: [
-              "Return `current_gold - potion_cost`"
+              "You can subtract values using the `-` operator with the parameters provided to the function.",
+              "You can do the calculation directly on your return line, or store it in a variable first."
             ]
           },
           {
@@ -319,53 +336,52 @@ total_gold = starting_gold + quest_reward # 75
             readTimeMinutes: 4,
             eli5Summary: 'If/Else is like checking a traffic light: IF the light is green, drive forward. ELSE, stop the car. It teaches computers how to make choices!',
             codeBreakdown: [
-              { code: 'if health > 0:', simpleMeaning: 'Checks if health is strictly greater than 0.' },
-              { code: 'return "Player is Alive!"', simpleMeaning: 'Only runs if the health test passed!' },
-              { code: 'else:', simpleMeaning: 'Runs if the health test was false (player has 0 or less health).' }
+              { code: 'if score > 0:', simpleMeaning: 'Checks if the condition is True. If yes, runs the indented lines below it.' },
+              { code: 'else:', simpleMeaning: 'The fallback plan: runs only if the condition above was False.' }
             ],
             commonMistakes: [
-              'Forgetting the colons (:) at the end of "if health > 0:" and "else:".',
+              'Forgetting the colons (:) at the end of "if ...:" and "else:".',
               'Forgetting to indent the return statement under the if and else.'
             ],
             quickCheckQuiz: {
               question: 'When does the "else" branch run in an if-else block?',
               options: [
-                'Only when the "if" test turns out to be False.',
+                'Never, it is just for decoration.',
                 'Every single time, no matter what.',
-                'Never, it is just for decoration.'
+                'Only when the "if" test turns out to be False.'
               ],
-              correctIndex: 0,
+              correctIndex: 2,
               explanation: '"else" is the fallback plan. It only triggers when the main "if" condition does not match.'
             },
             theoryMarkdown: `### Teaching the Computer to Choose
 
 Think of how you make decisions in everyday life:
-- **IF** the traffic light is green $\to$ drive forward.
-- **ELSE** $\to$ stop your car.
+- **IF** the fuel tank has gas $\to$ drive to the destination.
+- **ELSE** $\to$ walk on foot.
 
 In Python, we write this using \`if\` and \`else\`:
 
 \`\`\`python
-keys_in_pocket = 1
+# Example: checking car fuel
+fuel_liters = 15
 
-if keys_in_pocket > 0:
-    return "Door Unlocked!"
+if fuel_liters > 0:
+    return "Car can drive"
 else:
-    return "Door Locked!"
+    return "Out of gas"
 \`\`\`
 
-The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater than 0, so the door unlocks!`,
+The \`>\` symbol means "greater than". In Python, remember that lines starting with \`if\` or \`else\` always end with a colon \`:\`!`,
             instructions: [
-              "Write a function `check_player_status(health)`.",
-              "IF `health > 0`, return `\"Player is Alive!\"`.",
-              "ELSE, return `\"Player has Defeated!\"`."
+              "Write logic inside `check_player_status(health)`.",
+              "If `health` is strictly greater than `0`, return `\"Player is Alive!\"`.",
+              "Otherwise (`else`), return `\"Player has Defeated!\"`."
             ],
             starterCode: `def check_player_status(health):
-    # TODO: Check if health is greater than 0
-    if health > 0:
-        return "Player is Alive!"
-    else:
-        return "Player has Defeated!"
+    # Mission:
+    # 1. If health is greater than 0, return "Player is Alive!"
+    # 2. Otherwise (else), return "Player has Defeated!"
+    pass
 `,
             solutionCode: `def check_player_status(health):
     if health > 0:
@@ -388,7 +404,8 @@ The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater 
               }
             ],
             hints: [
-              "Use: `if health > 0:` and `else:`"
+              "Use the `>` comparison operator to check if `health` is greater than 0.",
+              "Make sure both the `if` and `else` lines end with colons `:`, and their return statements are indented."
             ]
           },
           {
@@ -404,8 +421,8 @@ The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater 
             readTimeMinutes: 4,
             eli5Summary: 'A function is like a blender: you define the recipe once, put strawberries in, and delicious smoothie comes out without rebuilding the blender!',
             codeBreakdown: [
-              { code: 'def cast_fireball(spell_power):', simpleMeaning: 'Defines a spell function that accepts an input number called spell_power.' },
-              { code: 'return f"Casting Fireball with {spell_power} power!"', simpleMeaning: 'F-string automatically inserts spell_power directly into the sentence.' }
+              { code: 'def spell(level):', simpleMeaning: 'Creates a function that accepts an input value called level.' },
+              { code: 'return f"Power is {level}"', simpleMeaning: 'An f-string dynamically inserts the variable inside curly braces {}.' }
             ],
             commonMistakes: [
               'Forgetting the lowercase "f" right in front of the quotes when building an f-string.'
@@ -413,11 +430,11 @@ The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater 
             quickCheckQuiz: {
               question: 'Why do we write functions instead of just writing code directly?',
               options: [
-                'So we can reuse the recipe hundreds of times without retyping it!',
                 'Because computers delete code that is not inside functions.',
+                'So we can reuse the recipe hundreds of times with different inputs without retyping!',
                 'Functions make typing slower.'
               ],
-              correctIndex: 0,
+              correctIndex: 1,
               explanation: 'Reusability is the superpower of functions. Write it once, call it anytime!'
             },
             theoryMarkdown: `### What is a Function?
@@ -429,23 +446,24 @@ Think of a kitchen blender.
 
 Instead of rebuilding the blender from scratch every morning, you just press the button!
 
-\`\`\`python
-# We define our recipe once:
-def make_smoothie(fruit):
-    return f"Fresh {fruit} Smoothie!"
+#### Formatting Text with Variables (F-Strings)
+In Python, if you put the letter \`f\` right in front of quotes, you can insert variables directly inside \`{curly_brackets}\`:
 
-# Now we can make as many as we want!
-glass1 = make_smoothie("Mango")
-glass2 = make_smoothie("Berry")
+\`\`\`python
+# Example: dynamic message
+hero = "Boots"
+damage = 25
+announcement = f"Hero {hero} dealt {damage} damage!"
 \`\`\``,
             instructions: [
-              "Write a function named `cast_fireball(spell_power)`.",
-              "It should return the text: `\"Casting Fireball with <spell_power> power!\"`.",
-              "Example: `cast_fireball(50)` should return `\"Casting Fireball with 50 power!\"`."
+              "Inside `cast_fireball(spell_power)`, format and return the spell text.",
+              "Return: `\"Casting Fireball with <spell_power> power!\"` (e.g. for power 50, return `\"Casting Fireball with 50 power!\"`).",
+              "Click 'Run Code' to test your answer."
             ],
             starterCode: `def cast_fireball(spell_power):
-    # TODO: Combine the text and spell_power
-    return f"Casting Fireball with {spell_power} power!"
+    # Mission: Return the formatted message:
+    # "Casting Fireball with <spell_power> power!"
+    pass
 `,
             solutionCode: `def cast_fireball(spell_power):
     return f"Casting Fireball with {spell_power} power!"
@@ -459,7 +477,8 @@ glass2 = make_smoothie("Berry")
               }
             ],
             hints: [
-              "Use an f-string: `return f\"Casting Fireball with {spell_power} power!\"`"
+              "Try using an f-string: place an `f` before the opening quote, then insert `{spell_power}` inside.",
+              "Check the capitalization and spacing of words like 'Casting Fireball with' and 'power!'."
             ]
           }
         ]
@@ -504,22 +523,29 @@ glass2 = make_smoothie("Berry")
             readTimeMinutes: 4,
             theoryMarkdown: `### Backend Payload Formatting
 
-Backend microservices frequently serialize status health checks and formatted banners.
+Backend microservices frequently serialize health metrics and node status banners. Two foundational habits keep services resilient:
+1. **Sanitizing Strings**: Stripping leading/trailing whitespace and standardizing casing prevent duplicate keys and route lookup mismatches.
+2. **Bounds Clamping**: Guarding integer metrics prevents invalid states like negative load or negative counts.
 
 \`\`\`python
-def format_server_banner(server_name, port, active_connections):
-    cleaned_name = server_name.strip().upper()
-    valid_connections = max(0, active_connections)
-    return f"[SERVER: {cleaned_name}] Port: {port} | Active Load: {valid_connections} clients"
+# Example: Sanitizing and bounding service metrics
+raw_service = "  billing-worker  "
+clean_service = raw_service.strip().upper()  # "BILLING-WORKER"
+
+# Clamp values so they never go negative:
+safe_queue = max(0, -10)  # Evaluates to 0
 \`\`\``,
             instructions: [
               "Implement `format_server_banner(server_name, port, active_connections)`.",
-              "Trim whitespace and uppercase `server_name`.",
-              "Clamp negative connections to `0`.",
-              "Return `\"[SERVER: <NAME>] Port: <PORT> | Active Load: <CONNECTIONS> clients\"`."
+              "Clean `server_name` by stripping whitespace and converting to uppercase.",
+              "Clamp `active_connections` so that negative values become `0`.",
+              "Return the formatted banner string: `\"[SERVER: <NAME>] Port: <PORT> | Active Load: <CONNECTIONS> clients\"`."
             ],
             starterCode: `def format_server_banner(server_name, port, active_connections):
-    # TODO: Clean server_name, validate connections, and return banner string
+    # Mission:
+    # 1. Clean server_name (strip whitespace and uppercase it)
+    # 2. Ensure active_connections is never less than 0
+    # 3. Return: "[SERVER: <NAME>] Port: <PORT> | Active Load: <CONNECTIONS> clients"
     pass
 `,
             solutionCode: `def format_server_banner(server_name, port, active_connections):
@@ -534,7 +560,10 @@ def format_server_banner(server_name, port, active_connections):
                 expectedOutput: '[SERVER: AUTH-SERVICE] Port: 8080 | Active Load: 42 clients'
               }
             ],
-            hints: ["Use `.strip().upper()` and `max(0, active_connections)`."]
+            hints: [
+              "Use python string methods `.strip()` to trim whitespace and `.upper()` to convert to uppercase.",
+              "Use `max(0, active_connections)` to ensure numbers below zero get lifted to 0."
+            ]
           },
           {
             id: 'py-02-oop',
@@ -639,24 +668,28 @@ class RateLimiter:
             interactiveType: 'sql',
             theoryMarkdown: `### Connecting Normalized Tables
 
-Relational databases split data across multiple tables. An **INNER JOIN** connects matching rows:
+Relational databases split data across multiple tables to avoid data duplication. An **INNER JOIN** connects rows from two tables whenever matching keys exist:
 
 \`\`\`sql
-SELECT users.name, orders.product, orders.amount
-FROM users
-INNER JOIN orders ON users.id = orders.user_id
-WHERE orders.status = 'completed';
+-- Example: Joining customers and shipments
+SELECT customers.full_name, shipments.tracking_number, shipments.cost
+FROM customers
+INNER JOIN shipments ON customers.id = shipments.customer_id
+WHERE shipments.status = 'delivered'
+ORDER BY shipments.cost DESC;
 \`\`\``,
             instructions: [
-              "Join `users` and `orders` on `users.id = orders.user_id`.",
-              "Filter for `orders.status = 'completed'`.",
-              "Order by `orders.amount DESC`."
+              "Write a query to select `users.name`, `orders.product`, and `orders.amount`.",
+              "Join `users` with `orders` on matching IDs: `users.id = orders.user_id`.",
+              "Filter for orders where `orders.status = 'completed'`.",
+              "Order the results by `orders.amount DESC` (highest amount first)."
             ],
-            starterCode: `SELECT users.name, orders.product, orders.amount
-FROM users
-JOIN orders ON users.id = orders.user_id
-WHERE orders.status = 'completed'
-ORDER BY orders.amount DESC;
+            starterCode: `-- Mission:
+-- 1. SELECT users.name, orders.product, orders.amount
+-- 2. Join users with orders on users.id = orders.user_id
+-- 3. Filter for orders where status is 'completed'
+-- 4. Order results by orders.amount descending
+
 `,
             solutionCode: `SELECT users.name, orders.product, orders.amount
 FROM users
@@ -671,7 +704,10 @@ ORDER BY orders.amount DESC;
                 expectedOutput: 'Valid relational result set'
               }
             ],
-            hints: ["Use `JOIN orders ON users.id = orders.user_id`."]
+            hints: [
+              "Start with `SELECT users.name, orders.product, orders.amount FROM users`.",
+              "Connect the tables using `JOIN orders ON users.id = orders.user_id`, followed by your `WHERE` and `ORDER BY` clauses."
+            ]
           }
         ]
       }
@@ -712,14 +748,25 @@ ORDER BY orders.amount DESC;
             interactiveType: 'terminal',
             theoryMarkdown: `### The Unix Pipe (\`|\`)
 
-Redirect the output of one command into another:
+The Unix philosophy is to build small, dedicated tools that do one job well, and connect them together using **pipes** (\`|\`). The pipe redirects the text output (stdout) of the left command straight into the input (stdin) of the right command!
+
 \`\`\`bash
-cat server.log | grep ERROR | wc -l
-\`\`\``,
+# Example: Read an audit log, filter for 404 errors, and count matching lines:
+cat audit.log | grep 404 | wc -l
+\`\`\`
+
+- \`cat file.log\`: Reads and dumps file contents.
+- \`grep KEYWORD\`: Filters only lines containing the keyword.
+- \`wc -l\`: Counts total lines in the stream.`,
             instructions: [
-              "Count the number of errors in `server.log` using `cat server.log | grep ERROR | wc -l`."
+              "Build a command pipeline using pipe operators (`|`).",
+              "Read the contents of `server.log` with `cat`.",
+              "Pipe into `grep` to filter only lines containing `ERROR`.",
+              "Pipe into `wc -l` to count how many error lines exist."
             ],
-            starterCode: `cat server.log | grep ERROR | wc -l
+            starterCode: `# Mission: Construct a Unix pipeline to count lines containing "ERROR" in server.log
+# Connect cat, grep, and wc -l using the pipe symbol (|):
+
 `,
             solutionCode: `cat server.log | grep ERROR | wc -l
 `,
@@ -730,7 +777,10 @@ cat server.log | grep ERROR | wc -l
                 expectedOutput: '3'
               }
             ],
-            hints: ["Type `cat server.log | grep ERROR | wc -l`."]
+            hints: [
+              "Chain three commands together using the pipe character `|`.",
+              "First read `server.log` with `cat`, then filter for `ERROR` with `grep`, then count with `wc -l`."
+            ]
           }
         ]
       }
@@ -948,7 +998,9 @@ An **LRU Cache** evicts the least recently accessed item when memory capacity is
 - Hash Map gives $O(1)$ lookups.
 - Doubly linked order list tracks recency.`,
             instructions: [
-              "Implement `LRUCache(capacity)` with `get(key)` and `put(key, value)`."
+              "Implement `LRUCache(capacity)`.",
+              "`get(key)`: If key exists, move it to the end of `order` (mark as most recently used) and return value; else return -1.",
+              "`put(key, value)`: If key exists, update value and order. If at capacity, evict the oldest key from `order` and `cache`. Store the new item."
             ],
             starterCode: `class LRUCache:
     def __init__(self, capacity: int):
@@ -957,20 +1009,15 @@ An **LRU Cache** evicts the least recently accessed item when memory capacity is
         self.order = []
 
     def get(self, key: str) -> int:
-        if key not in self.cache:
-            return -1
-        self.order.remove(key)
-        self.order.append(key)
-        return self.cache[key]
+        # Mission: If key is not found, return -1.
+        # Otherwise, update recency order and return the cached value.
+        pass
 
     def put(self, key: str, value: int) -> None:
-        if key in self.cache:
-            self.order.remove(key)
-        elif len(self.cache) >= self.capacity:
-            oldest = self.order.pop(0)
-            del self.cache[oldest]
-        self.cache[key] = value
-        self.order.append(key)
+        # Mission: Insert or update key/value.
+        # If at capacity, evict the least recently used key before inserting.
+        # Ensure key is marked as most recently used.
+        pass
 `,
             solutionCode: `class LRUCache:
     def __init__(self, capacity: int):
@@ -1001,7 +1048,10 @@ An **LRU Cache** evicts the least recently accessed item when memory capacity is
                 expectedOutput: 'LRU operations valid'
               }
             ],
-            hints: ["Move keys to the end of `order` on access."]
+            hints: [
+              "In `get()`: check `if key not in self.cache`. When found, remove `key` from `self.order` and append it to mark as newest.",
+              "In `put()`: if `len(self.cache) >= self.capacity`, pop index 0 from `self.order` and delete that key from `self.cache`."
+            ]
           }
         ]
       }
