@@ -28,6 +28,13 @@ import { SkillTreeView } from './components/gamification/SkillTreeView';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { ArchmageAiDrawer } from './components/ai/ArchmageAiDrawer';
 import { CertificationCenter } from './components/certification/CertificationCenter';
+import { BugChallengesView } from './components/practice/BugChallengesView';
+import { FlashcardsView } from './components/practice/FlashcardsView';
+import { PortfolioProjectsView } from './components/practice/PortfolioProjectsView';
+import { MockInterviewView } from './components/practice/MockInterviewView';
+import { GuildsLeaderboardView } from './components/community/GuildsLeaderboardView';
+import { VisualCodeStepper } from './components/debugger/VisualCodeStepper';
+import { JargonModal } from './components/layout/JargonModal';
 
 const initialUserStats: UserStats = {
   studentName: 'Backend Adventurer',
@@ -39,6 +46,9 @@ const initialUserStats: UserStats = {
   gems: 45,
   completedLessons: [],
   completedBosses: [],
+  completedBugChallenges: [],
+  masteredFlashcardIds: [],
+  joinedGuildId: 'guild-python',
   unlockedSkills: ['skill-py-core', 'skill-go-structs', 'skill-sql-joins'],
   inventory: initialInventoryItems,
   earnedCertificates: [],
@@ -100,6 +110,8 @@ export default function App() {
   const [isCharacterSheetOpen, setIsCharacterSheetOpen] = useState(false);
   const [isDailyQuestsOpen, setIsDailyQuestsOpen] = useState(false);
   const [isArchmageAiOpen, setIsArchmageAiOpen] = useState(false);
+  const [isStepperOpen, setIsStepperOpen] = useState(false);
+  const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [aiDiagnoseMessage, setAiDiagnoseMessage] = useState<string | null>(null);
 
   // Sync to localStorage
@@ -250,6 +262,43 @@ export default function App() {
     }));
   };
 
+  const handleBugFixed = (bugId: string, xp: number) => {
+    addXp(xp);
+    setUserStats(prev => {
+      const alreadyFixed = prev.completedBugChallenges?.includes(bugId);
+      return {
+        ...prev,
+        gems: prev.gems + 10,
+        completedBugChallenges: alreadyFixed
+          ? prev.completedBugChallenges
+          : [...(prev.completedBugChallenges || []), bugId]
+      };
+    });
+  };
+
+  const handleToggleMasteredFlashcard = (cardId: string) => {
+    setUserStats(prev => {
+      const current = prev.masteredFlashcardIds || [];
+      const isMastered = current.includes(cardId);
+      const updated = isMastered
+        ? current.filter(id => id !== cardId)
+        : [...current, cardId];
+      if (!isMastered) addXp(25);
+      return {
+        ...prev,
+        masteredFlashcardIds: updated
+      };
+    });
+  };
+
+  const handleJoinGuild = (guildId: string) => {
+    playSound('pass');
+    setUserStats(prev => ({
+      ...prev,
+      joinedGuildId: guildId
+    }));
+  };
+
   const handleApplyGeneratedQuest = (quest: any) => {
     if (!quest) return;
     const customLesson: LessonContent = {
@@ -289,6 +338,7 @@ export default function App() {
         onOpenCharacterSheet={() => setIsCharacterSheetOpen(true)}
         onOpenArchmageAI={() => setIsArchmageAiOpen(true)}
         onOpenDailyQuests={() => setIsDailyQuestsOpen(true)}
+        onOpenJargonModal={() => setIsJargonModalOpen(true)}
       />
 
       {/* Main Viewport Router */}
@@ -332,6 +382,7 @@ export default function App() {
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     onAskAI={() => setIsArchmageAiOpen(true)}
+                    onOpenStepper={() => setIsStepperOpen(true)}
                   />
                 </div>
 
@@ -386,6 +437,39 @@ export default function App() {
             onUnlockSkill={handleUnlockSkill}
           />
         )}
+
+        {currentView === 'bug-bounty' && (
+          <BugChallengesView
+            completedBugIds={userStats.completedBugChallenges || []}
+            onBugFixed={handleBugFixed}
+            onBackToCurriculum={() => setCurrentView('curriculum')}
+          />
+        )}
+
+        {currentView === 'flashcards' && (
+          <FlashcardsView
+            masteredCardIds={userStats.masteredFlashcardIds || []}
+            onToggleMastered={handleToggleMasteredFlashcard}
+          />
+        )}
+
+        {currentView === 'portfolio' && (
+          <PortfolioProjectsView />
+        )}
+
+        {currentView === 'interview' && (
+          <MockInterviewView />
+        )}
+
+        {currentView === 'guilds' && (
+          <GuildsLeaderboardView
+            currentGuildId={userStats.joinedGuildId}
+            onJoinGuild={handleJoinGuild}
+            userXp={userStats.currentXp}
+            userStreak={userStats.streakDays}
+            userName={userStats.studentName}
+          />
+        )}
       </main>
 
       {/* Gamification Modals */}
@@ -416,6 +500,21 @@ export default function App() {
           currentCode: code
         }}
         onApplyGeneratedQuest={handleApplyGeneratedQuest}
+      />
+
+      {/* Visual Memory Stepper Modal */}
+      {isStepperOpen && (
+        <VisualCodeStepper
+          code={code}
+          language={selectedLesson.language}
+          onClose={() => setIsStepperOpen(false)}
+        />
+      )}
+
+      {/* Beginner Jargon Buster Dictionary Modal */}
+      <JargonModal
+        isOpen={isJargonModalOpen}
+        onClose={() => setIsJargonModalOpen(false)}
       />
     </div>
   );

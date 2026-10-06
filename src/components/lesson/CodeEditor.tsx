@@ -12,6 +12,7 @@ interface CodeEditorProps {
   activeTab: 'code' | 'tests' | 'console';
   setActiveTab: (tab: 'code' | 'tests' | 'console') => void;
   onAskAI: () => void;
+  onOpenStepper?: () => void;
 }
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
@@ -23,7 +24,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   activeTab,
   setActiveTab,
-  onAskAI
+  onAskAI,
+  onOpenStepper
 }) => {
   const [copied, setCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -102,6 +104,17 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           >
             {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
+
+          {onOpenStepper && (
+            <button
+              onClick={onOpenStepper}
+              title="Step through code line-by-line & view RAM memory variables"
+              className="flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 px-2.5 py-1.5 text-xs rounded-md transition-all active:scale-95 cursor-pointer font-medium"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-sky-400" />
+              <span className="hidden sm:inline">Memory Stepper</span>
+            </button>
+          )}
 
           <button
             onClick={onRun}

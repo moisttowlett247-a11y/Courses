@@ -172,6 +172,75 @@ export interface EarnedCertificate {
   honors: boolean;
 }
 
+// ==========================================
+// NEW FEATURE TYPES (Bug Quests, Flashcards, Projects, Interviews, Guilds)
+// ==========================================
+
+export interface BugChallenge {
+  id: string;
+  title: string;
+  language: ProgrammingLanguage;
+  difficulty: Difficulty;
+  bugType: 'Syntax Error' | 'Logic Bug' | 'Off-by-One' | 'Database Trap' | 'Concurrency Race';
+  scenario: string;
+  brokenCode: string;
+  fixedSolution: string;
+  bugHint: string;
+  testCases: TestCase[];
+  xpReward: number;
+}
+
+export interface Flashcard {
+  id: string;
+  category: 'Python' | 'SQL' | 'Go' | 'Architecture';
+  frontQuestion: string;
+  backAnswer: string;
+  eli5Analogy: string;
+  codeExample?: string;
+  mastered?: boolean;
+}
+
+export interface PortfolioProjectFile {
+  filename: string;
+  code: string;
+  language: string;
+}
+
+export interface PortfolioProject {
+  id: string;
+  title: string;
+  tag: string;
+  description: string;
+  difficulty: Difficulty;
+  techStack: string[];
+  architectureOverview: string;
+  learningOutcomes: string[];
+  files: PortfolioProjectFile[];
+  githubReadmeMarkdown: string;
+}
+
+export interface MockInterviewPrompt {
+  id: string;
+  roleTitle: string;
+  companyVibe: string;
+  question: string;
+  interviewerPersona: string;
+  expectedKeyPoints: string[];
+  idealResponse: string;
+  followUpQuestion: string;
+}
+
+export interface Guild {
+  id: string;
+  name: string;
+  tagline: string;
+  icon: string;
+  color: string;
+  members: number;
+  weeklyXp: number;
+  perk: string;
+}
+
 export interface UserStats {
   studentName: string;
   level: number;
@@ -182,6 +251,9 @@ export interface UserStats {
   gems: number;
   completedLessons: string[];
   completedBosses: string[];
+  completedBugChallenges: string[];
+  masteredFlashcardIds: string[];
+  joinedGuildId?: string;
   unlockedSkills: string[];
   inventory: InventoryItem[];
   earnedCertificates: EarnedCertificate[];
