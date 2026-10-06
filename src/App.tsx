@@ -12,6 +12,7 @@ import { LessonContent, UserStats, BossRaid, InventoryItem, EarnedCertificate } 
 import { runInteractiveCode, ExecutionResult } from './utils/codeRunner';
 import { playSound } from './utils/soundEffects';
 import confetti from 'canvas-confetti';
+import { Menu, Split, BookOpen, Code2 } from 'lucide-react';
 
 // Layout & Components
 import { Navbar } from './components/layout/Navbar';
@@ -104,7 +105,13 @@ export default function App() {
   const [testResults, setTestResults] = useState<ExecutionResult | null>(null);
   const [activeTab, setActiveTab] = useState<'code' | 'tests' | 'console'>('code');
   const [revealedHints, setRevealedHints] = useState<number[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024;
+    }
+    return false;
+  });
+  const [layoutMode, setLayoutMode] = useState<'both' | 'theory' | 'editor'>('both');
 
   // Modals & Drawers
   const [isCharacterSheetOpen, setIsCharacterSheetOpen] = useState(false);
@@ -344,7 +351,7 @@ export default function App() {
       {/* Main Viewport Router */}
       <main className="flex-1 flex overflow-hidden">
         {currentView === 'curriculum' && (
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden min-w-0">
             {/* Sidebar Syllabus */}
             <Sidebar
               tracks={backendTracks}
@@ -356,45 +363,122 @@ export default function App() {
               onNavigateToCertifications={() => setCurrentView('certifications')}
             />
 
-            {/* Main Lesson Split Area */}
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-              {/* Left 50%: Theory & Instructions */}
-              <div className="w-full md:w-1/2 border-r border-slate-800 bg-slate-950 overflow-hidden flex flex-col">
-                <TheoryViewer
-                  lesson={selectedLesson}
-                  isCompleted={userStats.completedLessons.includes(selectedLesson.id)}
-                  revealedHints={revealedHints}
-                  onShowHint={(idx) => setRevealedHints(prev => [...prev, idx])}
-                  onOpenAIHint={() => setIsArchmageAiOpen(true)}
-                />
-              </div>
+            {/* Main Lesson Content Wrapper */}
+            <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+              {/* Sub-Header Toolbar with Syllabus Toggle & View Switcher */}
+              <div className="h-10 border-b border-slate-800 bg-slate-900/90 px-3 flex items-center justify-between gap-2 shrink-0 text-xs z-10">
+                <div className="flex items-center gap-2 min-w-0">
+                  <button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    title={isSidebarOpen ? "Hide syllabus sidebar" : "Show syllabus sidebar"}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition-colors cursor-pointer ${
+                      isSidebarOpen
+                        ? 'bg-slate-800 border-slate-700 text-slate-200'
+                        : 'bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20'
+                    }`}
+                  >
+                    <Menu className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{isSidebarOpen ? 'Hide Syllabus' : 'Syllabus'}</span>
+                  </button>
 
-              {/* Right 50%: Code Editor & Test Results Panel */}
-              <div className="w-full md:w-1/2 flex flex-col overflow-hidden bg-slate-950">
-                <div className="flex-1 overflow-hidden">
-                  <CodeEditor
-                    code={code}
-                    onChange={(newCode) => setCode(newCode)}
-                    onRun={handleRunCode}
-                    onReset={() => setCode(selectedLesson.starterCode)}
-                    isRunning={isRunning}
-                    language={selectedLesson.language}
-                    activeTab={activeTab}
-                    setActiveTab={setActiveTab}
-                    onAskAI={() => setIsArchmageAiOpen(true)}
-                    onOpenStepper={() => setIsStepperOpen(true)}
-                  />
+                  <span className="text-slate-600 hidden sm:inline">|</span>
+
+                  <span className="text-slate-300 font-semibold truncate max-w-[140px] sm:max-w-xs md:max-w-md">
+                    {selectedLesson.title}
+                  </span>
                 </div>
 
-                {/* Bottom Test Results Console */}
-                <TestResultsPanel
-                  results={testResults}
-                  isRunning={isRunning}
-                  onAskAIDiagnose={(err) => {
-                    setAiDiagnoseMessage(err);
-                    setIsArchmageAiOpen(true);
-                  }}
-                />
+                {/* View Mode Segmented Switcher (Especially helpful on phones & desktop mode) */}
+                <div className="flex items-center gap-1 p-0.5 bg-slate-950 rounded-lg border border-slate-800 shrink-0">
+                  <button
+                    onClick={() => setLayoutMode('theory')}
+                    title="Full-width Theory view"
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      layoutMode === 'theory'
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <BookOpen className="h-3 w-3" />
+                    <span className="hidden sm:inline">Theory</span>
+                  </button>
+
+                  <button
+                    onClick={() => setLayoutMode('editor')}
+                    title="Full-width Code Editor view (Max screen space for coding & running)"
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      layoutMode === 'editor'
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Code2 className="h-3 w-3" />
+                    <span>Code</span>
+                  </button>
+
+                  <button
+                    onClick={() => setLayoutMode('both')}
+                    title="Split view (Side-by-side)"
+                    className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                      layoutMode === 'both'
+                        ? 'bg-amber-500 text-slate-950 font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Split className="h-3 w-3" />
+                    <span className="hidden sm:inline">Split</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Lesson Split Area */}
+              <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-w-0">
+                {/* Left: Theory & Instructions */}
+                {(layoutMode === 'both' || layoutMode === 'theory') && (
+                  <div className={`${
+                    layoutMode === 'theory' ? 'w-full' : 'w-full md:w-1/2'
+                  } border-r border-slate-800 bg-slate-950 overflow-hidden flex flex-col min-w-0`}>
+                    <TheoryViewer
+                      lesson={selectedLesson}
+                      isCompleted={userStats.completedLessons.includes(selectedLesson.id)}
+                      revealedHints={revealedHints}
+                      onShowHint={(idx) => setRevealedHints(prev => [...prev, idx])}
+                      onOpenAIHint={() => setIsArchmageAiOpen(true)}
+                    />
+                  </div>
+                )}
+
+                {/* Right: Code Editor & Test Results Panel */}
+                {(layoutMode === 'both' || layoutMode === 'editor') && (
+                  <div className={`${
+                    layoutMode === 'editor' ? 'w-full' : 'w-full md:w-1/2'
+                  } flex flex-col overflow-hidden bg-slate-950 min-w-0`}>
+                    <div className="flex-1 overflow-hidden min-w-0">
+                      <CodeEditor
+                        code={code}
+                        onChange={(newCode) => setCode(newCode)}
+                        onRun={handleRunCode}
+                        onReset={() => setCode(selectedLesson.starterCode)}
+                        isRunning={isRunning}
+                        language={selectedLesson.language}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        onAskAI={() => setIsArchmageAiOpen(true)}
+                        onOpenStepper={() => setIsStepperOpen(true)}
+                      />
+                    </div>
+
+                    {/* Bottom Test Results Console */}
+                    <TestResultsPanel
+                      results={testResults}
+                      isRunning={isRunning}
+                      onAskAIDiagnose={(err) => {
+                        setAiDiagnoseMessage(err);
+                        setIsArchmageAiOpen(true);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

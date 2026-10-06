@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Track, LessonContent, TierLevel } from '../../types/curriculum';
-import { CheckCircle2, Circle, BookOpen, Terminal, Cpu, Database, Network, Layers, Sparkles, Filter } from 'lucide-react';
+import { CheckCircle2, Circle, BookOpen, Terminal, Cpu, Database, Network, Layers, Sparkles, Filter, X } from 'lucide-react';
 
 interface SidebarProps {
   tracks: Track[];
@@ -18,6 +18,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   completedLessons,
   onSelectLesson,
   isOpen,
+  onToggle,
   onNavigateToCertifications
 }) => {
   const [selectedTier, setSelectedTier] = useState<TierLevel | 'all'>('all');
@@ -50,14 +51,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <aside className={`w-80 shrink-0 border-r border-slate-800 bg-slate-950 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden transition-all ${isOpen ? 'block' : 'hidden md:block'}`}>
+    <aside className={`w-80 shrink-0 border-r border-slate-800 bg-slate-950 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden transition-all ${isOpen ? 'flex' : 'hidden'}`}>
       {/* Tier Filter Tabs */}
       <div className="p-3 border-b border-slate-800 bg-slate-900/60 space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             Difficulty Tier
           </span>
-          <span className="text-[10px] text-amber-400 font-mono">Zero-to-Hero</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-amber-400 font-mono">Zero-to-Hero</span>
+            <button
+              onClick={onToggle}
+              title="Close Syllabus Sidebar"
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-4 gap-1 p-1 bg-slate-950 rounded-lg border border-slate-800 text-[11px] font-medium">
