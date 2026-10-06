@@ -1,0 +1,6 @@
+{
+  "name": "BootForge Backend Academy",
+  "description": "Interactive gamified backend engineering learning platform inspired by boot.dev, featuring Python, Go, SQL, Docker, Algorithms, Architecture, Boss Raids, and terminal simulations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
