@@ -85,6 +85,31 @@ export const CharacterSheet: React.FC<CharacterSheetProps> = ({
             </div>
           </div>
 
+          {/* Verified Credentials Section */}
+          {userStats.earnedCertificates && userStats.earnedCertificates.length > 0 && (
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Award className="h-4 w-4" /> Earned Certifications ({userStats.earnedCertificates.length})
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {userStats.earnedCertificates.map((cert) => (
+                  <div key={cert.id} className="p-3 rounded-lg border border-amber-500/40 bg-amber-950/20 space-y-1">
+                    <div className="font-bold text-xs text-amber-300 flex items-center gap-1">
+                      <Sparkles className="h-3 w-3 text-amber-400" />
+                      <span>{cert.credentialTitle}</span>
+                    </div>
+                    <div className="text-[11px] text-slate-300">
+                      Score: <strong className="text-emerald-400">{cert.scorePercent}%</strong> · {cert.issuedDate}
+                    </div>
+                    <div className="text-[10px] font-mono text-slate-500">
+                      ID: {cert.verificationCode}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Equipped Gear & Inventory */}
           <div className="space-y-3">
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">

@@ -9,6 +9,7 @@ interface SidebarProps {
   onSelectLesson: (lesson: LessonContent) => void;
   isOpen: boolean;
   onToggle: () => void;
+  onNavigateToCertifications?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -16,7 +17,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   selectedLessonId,
   completedLessons,
   onSelectLesson,
-  isOpen
+  isOpen,
+  onNavigateToCertifications
 }) => {
   const [selectedTier, setSelectedTier] = useState<TierLevel | 'all'>('all');
 
@@ -168,6 +170,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   );
                 })}
               </div>
+
+              {/* Take Track Certification Exam Link */}
+              {onNavigateToCertifications && (
+                <div className="pt-2 border-t border-slate-800/60 mt-1">
+                  <button
+                    onClick={onNavigateToCertifications}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-semibold transition-colors cursor-pointer"
+                  >
+                    <span>🎓 Track Certification Exam</span>
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

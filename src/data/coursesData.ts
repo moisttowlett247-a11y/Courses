@@ -36,6 +36,25 @@ export const backendTracks: Track[] = [
             language: 'python',
             xpReward: 30,
             readTimeMinutes: 2,
+            eli5Summary: 'A computer is like a super-fast puppy: it has zero imagination, but it will follow your exact step-by-step instructions from top to bottom!',
+            codeBreakdown: [
+              { code: 'def start_adventure():', simpleMeaning: 'Tells Python: "I am creating a new recipe named start_adventure".' },
+              { code: 'return "I am now a programmer!"', simpleMeaning: '"return" means: hand this finished sentence back to whoever asked for it.' }
+            ],
+            commonMistakes: [
+              'Deleting the colon (:) at the end of the line. In Python, colons are required at the end of recipe headers!',
+              'Forgetting the 4 spaces of indentation. The steps inside a recipe must be indented so Python knows they belong together.'
+            ],
+            quickCheckQuiz: {
+              question: 'What does a computer do when it runs your code?',
+              options: [
+                'It follows every line of instruction from top to bottom like a recipe.',
+                'It guesses what you wanted even if there are spelling errors.',
+                'It closes all open apps.'
+              ],
+              correctIndex: 0,
+              explanation: 'Computers are literal machines. They follow your instructions step-by-step in exact sequence!'
+            },
             theoryMarkdown: `### What is Code? (Don't Panic!)
 
 You do not need to be a math genius to code. 
@@ -91,6 +110,25 @@ def start_adventure():
             language: 'python',
             xpReward: 35,
             readTimeMinutes: 3,
+            eli5Summary: 'Putting text in quotes is like writing a label on a cardboard box. Without quotes, the computer thinks you are typing a secret computer command!',
+            codeBreakdown: [
+              { code: 'def guild_welcome():', simpleMeaning: 'Defines a recipe called guild_welcome.' },
+              { code: 'return "Welcome to the Guild!"', simpleMeaning: 'Hands back the greeting wrapped in safe quotation marks.' }
+            ],
+            commonMistakes: [
+              'Mixing different quotes like "Hello\' (start with double quotes, finish with double quotes!).',
+              'Forgetting quotes entirely: writing return Welcome will cause an error because Python thinks Welcome is an unknown command.'
+            ],
+            quickCheckQuiz: {
+              question: 'Why do words in code need quotation marks ("...") around them?',
+              options: [
+                'To tell the computer: "This is human reading text, do not treat it as a command."',
+                'Because quotes make the computer speakers louder.',
+                'To make words italic.'
+              ],
+              correctIndex: 0,
+              explanation: 'Quotes are protective shields that tell the computer: "Treat this as pure text, do not try to execute it as computer code".'
+            },
             theoryMarkdown: `### Teaching the Computer to Read Words
 
 Computers are great with numbers, but when we want them to handle words (like names, messages, or dialogue), we must wrap the text in **quotes** \`"..."\`.
@@ -139,6 +177,25 @@ In coding, text inside quotes is called a **String** (because it's a string of c
             language: 'python',
             xpReward: 40,
             readTimeMinutes: 3,
+            eli5Summary: 'A variable is like sticking a label on a jar on your kitchen counter. If you write "gold" on the label and put 50 in, the jar remembers it!',
+            codeBreakdown: [
+              { code: 'player_health = 100', simpleMeaning: 'Creates a container labeled "player_health" and puts the number 100 inside.' },
+              { code: 'return player_health', simpleMeaning: 'Takes the 100 out of the jar and hands it back.' }
+            ],
+            commonMistakes: [
+              'Putting the value on the left side (e.g. 100 = player_health). The jar name MUST always be on the left!',
+              'Putting spaces in the variable name (e.g. player health). In code, we use underscores like player_health.'
+            ],
+            quickCheckQuiz: {
+              question: 'In the code `gold = 50`, what does the `=` symbol mean?',
+              options: [
+                'Put the value 50 into the container named gold.',
+                'Check if gold is equal to 50.',
+                'Delete 50 coins.'
+              ],
+              correctIndex: 0,
+              explanation: 'A single = sign is the "assignment" symbol. It takes what is on the right and stores it into the name on the left.'
+            },
             theoryMarkdown: `### What is a Variable?
 
 Imagine your kitchen counter has glass jars with sticky labels on them:
@@ -190,6 +247,24 @@ In Python, the \`=\` sign means **"put the value on the right into the jar on th
             language: 'python',
             xpReward: 40,
             readTimeMinutes: 3,
+            eli5Summary: 'Math in code is as easy as typing on your phone calculator: + adds coins together, and - subtracts what you spend at the shop!',
+            codeBreakdown: [
+              { code: 'def buy_health_potion(current_gold, potion_cost):', simpleMeaning: 'A recipe that accepts your current gold and the cost of the potion.' },
+              { code: 'return current_gold - potion_cost', simpleMeaning: 'Subtracts the cost and hands back your remaining balance.' }
+            ],
+            commonMistakes: [
+              'Calculating the math but forgetting to write "return". Without return, the computer keeps the answer to itself!'
+            ],
+            quickCheckQuiz: {
+              question: 'If you have 50 gold and buy an item for 15 gold, how does Python calculate your change?',
+              options: [
+                'current_gold - item_cost',
+                'current_gold + item_cost',
+                'current_gold / item_cost'
+              ],
+              correctIndex: 0,
+              explanation: 'Minus (-) subtracts the cost from your current money, leaving you with 35 gold.'
+            },
             theoryMarkdown: `### Simple Math with Code
 
 Coding math works just like a pocket calculator:
@@ -242,6 +317,26 @@ total_gold = starting_gold + quest_reward # 75
             language: 'python',
             xpReward: 45,
             readTimeMinutes: 4,
+            eli5Summary: 'If/Else is like checking a traffic light: IF the light is green, drive forward. ELSE, stop the car. It teaches computers how to make choices!',
+            codeBreakdown: [
+              { code: 'if health > 0:', simpleMeaning: 'Checks if health is strictly greater than 0.' },
+              { code: 'return "Player is Alive!"', simpleMeaning: 'Only runs if the health test passed!' },
+              { code: 'else:', simpleMeaning: 'Runs if the health test was false (player has 0 or less health).' }
+            ],
+            commonMistakes: [
+              'Forgetting the colons (:) at the end of "if health > 0:" and "else:".',
+              'Forgetting to indent the return statement under the if and else.'
+            ],
+            quickCheckQuiz: {
+              question: 'When does the "else" branch run in an if-else block?',
+              options: [
+                'Only when the "if" test turns out to be False.',
+                'Every single time, no matter what.',
+                'Never, it is just for decoration.'
+              ],
+              correctIndex: 0,
+              explanation: '"else" is the fallback plan. It only triggers when the main "if" condition does not match.'
+            },
             theoryMarkdown: `### Teaching the Computer to Choose
 
 Think of how you make decisions in everyday life:
@@ -307,6 +402,24 @@ The \`>\` symbol means "greater than". If \`keys_in_pocket\` is 1, 1 is greater 
             language: 'python',
             xpReward: 50,
             readTimeMinutes: 4,
+            eli5Summary: 'A function is like a blender: you define the recipe once, put strawberries in, and delicious smoothie comes out without rebuilding the blender!',
+            codeBreakdown: [
+              { code: 'def cast_fireball(spell_power):', simpleMeaning: 'Defines a spell function that accepts an input number called spell_power.' },
+              { code: 'return f"Casting Fireball with {spell_power} power!"', simpleMeaning: 'F-string automatically inserts spell_power directly into the sentence.' }
+            ],
+            commonMistakes: [
+              'Forgetting the lowercase "f" right in front of the quotes when building an f-string.'
+            ],
+            quickCheckQuiz: {
+              question: 'Why do we write functions instead of just writing code directly?',
+              options: [
+                'So we can reuse the recipe hundreds of times without retyping it!',
+                'Because computers delete code that is not inside functions.',
+                'Functions make typing slower.'
+              ],
+              correctIndex: 0,
+              explanation: 'Reusability is the superpower of functions. Write it once, call it anytime!'
+            },
             theoryMarkdown: `### What is a Function?
 
 Think of a kitchen blender.

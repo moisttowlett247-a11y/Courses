@@ -8,7 +8,7 @@ import { backendTracks } from './data/coursesData';
 import { bossRaids } from './data/bossRaidsData';
 import { skillTreeNodes } from './data/skillTreeData';
 import { initialInventoryItems } from './data/inventoryData';
-import { LessonContent, UserStats, BossRaid, InventoryItem } from './types/curriculum';
+import { LessonContent, UserStats, BossRaid, InventoryItem, EarnedCertificate } from './types/curriculum';
 import { runInteractiveCode, ExecutionResult } from './utils/codeRunner';
 import { playSound } from './utils/soundEffects';
 import confetti from 'canvas-confetti';
@@ -27,8 +27,10 @@ import { CharacterSheet } from './components/gamification/CharacterSheet';
 import { SkillTreeView } from './components/gamification/SkillTreeView';
 import { DailyQuestsModal } from './components/gamification/DailyQuestsModal';
 import { ArchmageAiDrawer } from './components/ai/ArchmageAiDrawer';
+import { CertificationCenter } from './components/certification/CertificationCenter';
 
 const initialUserStats: UserStats = {
+  studentName: 'Backend Adventurer',
   level: 1,
   currentXp: 0,
   xpToNextLevel: 100,
@@ -39,6 +41,7 @@ const initialUserStats: UserStats = {
   completedBosses: [],
   unlockedSkills: ['skill-py-core', 'skill-go-structs', 'skill-sql-joins'],
   inventory: initialInventoryItems,
+  earnedCertificates: [],
   equippedItems: {
     weapon: 'item-keeb-novice',
     armor: 'item-robe-apprentice'
@@ -216,6 +219,25 @@ export default function App() {
     }));
   };
 
+  const handleCertificateEarned = (certificate: EarnedCertificate) => {
+    setUserStats(prev => {
+      const existing = prev.earnedCertificates || [];
+      const updated = existing.filter(c => c.examId !== certificate.examId);
+      return {
+        ...prev,
+        earnedCertificates: [...updated, certificate]
+      };
+    });
+    addXp(300);
+  };
+
+  const handleUpdateStudentName = (name: string) => {
+    setUserStats(prev => ({
+      ...prev,
+      studentName: name
+    }));
+  };
+
   const handleClaimQuest = (questId: string) => {
     const quest = userStats.dailyQuests.find(q => q.id === questId);
     if (!quest || !quest.completed) return;
@@ -281,6 +303,7 @@ export default function App() {
               onSelectLesson={handleSelectLesson}
               isOpen={isSidebarOpen}
               onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+              onNavigateToCertifications={() => setCurrentView('certifications')}
             />
 
             {/* Main Lesson Split Area */}
@@ -331,6 +354,20 @@ export default function App() {
         {currentView === 'terminal' && <TerminalEmulator />}
 
         {currentView === 'architecture' && <SystemDesignCanvas />}
+
+        {currentView === 'certifications' && (
+          <CertificationCenter
+            userStats={userStats}
+            onCertificateEarned={handleCertificateEarned}
+            onUpdateStudentName={handleUpdateStudentName}
+            onNavigateToTrack={(trackId) => {
+              const track = backendTracks.find(t => t.id === trackId);
+              if (track && track.courses[0]?.lessons[0]) {
+                handleSelectLesson(track.courses[0].lessons[0]);
+              }
+            }}
+          />
+        )}
 
         {currentView === 'boss-raids' && (
           <BossRaidModal

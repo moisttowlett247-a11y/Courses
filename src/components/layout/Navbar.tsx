@@ -47,6 +47,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           Curriculum
         </button>
         <button
+          onClick={() => onNavigate('certifications')}
+          className={`hover:text-amber-400 transition-colors flex items-center gap-1.5 ${currentView === 'certifications' ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5' : ''}`}
+        >
+          <span>Certifications</span>
+          {userStats.earnedCertificates && userStats.earnedCertificates.length > 0 && (
+            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold">
+              {userStats.earnedCertificates.length}
+            </span>
+          )}
+        </button>
+        <button
           onClick={() => onNavigate('boss-raids')}
           className={`hover:text-amber-400 transition-colors ${currentView === 'boss-raids' ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5' : ''}`}
         >
@@ -69,12 +80,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           className={`hover:text-amber-400 transition-colors ${currentView === 'architecture' ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5' : ''}`}
         >
           System Design
-        </button>
-        <button
-          onClick={() => onNavigate('skill-tree')}
-          className={`hover:text-amber-400 transition-colors ${currentView === 'skill-tree' ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5' : ''}`}
-        >
-          Skill Tree
         </button>
       </nav>
 

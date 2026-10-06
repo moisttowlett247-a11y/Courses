@@ -12,6 +12,18 @@ export interface TestCase {
   hidden?: boolean;
 }
 
+export interface LineBreakdown {
+  code: string;
+  simpleMeaning: string;
+}
+
+export interface QuickCheck {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
 export interface LessonContent {
   id: string;
   trackId: string;
@@ -31,6 +43,10 @@ export interface LessonContent {
   hints: string[];
   explanation?: string;
   interactiveType?: 'code' | 'sql' | 'terminal' | 'architecture';
+  eli5Summary?: string;
+  codeBreakdown?: LineBreakdown[];
+  commonMistakes?: string[];
+  quickCheckQuiz?: QuickCheck;
 }
 
 export interface Course {
@@ -57,6 +73,7 @@ export interface Track {
   accentColor: string;
   tier: TierLevel;
   courses: Course[];
+  certificationId?: string;
 }
 
 export interface BossPhase {
@@ -120,7 +137,43 @@ export interface InventoryItem {
   unlockedAt?: string;
 }
 
+export interface ExamQuestion {
+  id: string;
+  question: string;
+  codeSnippet?: string;
+  options: string[];
+  correctIndex: number;
+  simpleExplanation: string;
+}
+
+export interface CertificationExam {
+  id: string;
+  title: string;
+  subtitle: string;
+  credentialTitle: string;
+  badgeName: string;
+  trackId: string;
+  icon: string;
+  passingScorePercent: number;
+  skillsMeasured: string[];
+  questions: ExamQuestion[];
+  certificateDescription: string;
+}
+
+export interface EarnedCertificate {
+  id: string;
+  examId: string;
+  credentialTitle: string;
+  studentName: string;
+  scorePercent: number;
+  issuedDate: string;
+  verificationCode: string;
+  badgeName: string;
+  honors: boolean;
+}
+
 export interface UserStats {
+  studentName: string;
   level: number;
   currentXp: number;
   xpToNextLevel: number;
@@ -131,6 +184,7 @@ export interface UserStats {
   completedBosses: string[];
   unlockedSkills: string[];
   inventory: InventoryItem[];
+  earnedCertificates: EarnedCertificate[];
   equippedItems: {
     weapon?: string;
     armor?: string;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LessonContent } from '../../types/curriculum';
 import { jargonDictionary, JargonTerm } from '../../data/jargonData';
-import { BookOpen, CheckCircle, HelpCircle, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp, BookA, X } from 'lucide-react';
+import { BookOpen, CheckCircle2, HelpCircle, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp, BookA, X, AlertTriangle, Lightbulb, Code2 } from 'lucide-react';
 import { playSound } from '../../utils/soundEffects';
 
 interface TheoryViewerProps {
@@ -21,7 +21,10 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
 }) => {
   const [showSolution, setShowSolution] = useState(false);
   const [showJargonModal, setShowJargonModal] = useState(false);
-  const [selectedJargon, setSelectedJargon] = useState<JargonTerm | null>(null);
+  const [showEli5, setShowEli5] = useState(true);
+  const [showBreakdown, setShowBreakdown] = useState(true);
+  const [selectedQuizOption, setSelectedQuizOption] = useState<number | null>(null);
+  const [quizAnswered, setQuizAnswered] = useState(false);
   const [checkedInstructions, setCheckedInstructions] = useState<number[]>([]);
 
   const toggleInstruction = (idx: number) => {
@@ -31,8 +34,19 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
     );
   };
 
+  const handleSelectQuiz = (idx: number) => {
+    playSound('key');
+    setSelectedQuizOption(idx);
+    setQuizAnswered(true);
+    if (lesson.quickCheckQuiz && idx === lesson.quickCheckQuiz.correctIndex) {
+      playSound('pass');
+    } else {
+      playSound('fail');
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full overflow-y-auto p-5 text-slate-200 space-y-6">
+    <div className="flex flex-col h-full overflow-y-auto p-5 text-slate-200 space-y-5">
       {/* Title & Metadata */}
       <div>
         <div className="flex items-center gap-2 text-xs text-slate-400 mb-1.5 flex-wrap">
@@ -59,23 +73,45 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
           {lesson.title}
         </h1>
 
-        {lesson.tier === 'beginner' && (
-          <div className="mt-2.5 p-3 rounded-lg border border-emerald-500/30 bg-emerald-950/20 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-emerald-300">
-              <span className="text-base">🌱</span>
-              <span><strong>New to coding?</strong> We explain everything like baking recipes. No math or experience needed!</span>
-            </div>
-            <button
-              onClick={() => setShowJargonModal(true)}
-              className="text-[11px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded transition-colors whitespace-nowrap ml-2 flex items-center gap-1"
-            >
-              <BookA className="h-3.5 w-3.5" /> Plain English Dictionary
-            </button>
+        {/* Jargon Dictionary Toolbar */}
+        <div className="mt-2.5 flex items-center justify-between gap-2 p-2.5 rounded-lg border border-slate-800 bg-slate-900/50">
+          <div className="flex items-center gap-2 text-xs text-slate-300">
+            <span className="text-sm">💡</span>
+            <span>Zero confusion guarantee: Every concept is broken down in simple human words.</span>
           </div>
-        )}
+
+          <button
+            onClick={() => setShowJargonModal(true)}
+            className="text-[11px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer shrink-0"
+          >
+            <BookA className="h-3.5 w-3.5" /> Jargon Dictionary
+          </button>
+        </div>
       </div>
 
-      {/* Markdown Theory Content */}
+      {/* ELI5 (Explain Like I'm 5) Card */}
+      {lesson.eli5Summary && (
+        <div className="rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-950/30 to-slate-900 p-4 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <Lightbulb className="h-4 w-4" /> Explain Like I'm 5 (Super Simple Analogy)
+            </span>
+            <button
+              onClick={() => setShowEli5(!showEli5)}
+              className="text-[11px] text-amber-400/80 hover:text-amber-300"
+            >
+              {showEli5 ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          {showEli5 && (
+            <p className="text-xs text-amber-200/90 leading-relaxed pt-1">
+              {lesson.eli5Summary}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Main Theory Explanation */}
       <div className="prose prose-invert prose-sm max-w-none text-slate-300 space-y-4 leading-relaxed">
         {lesson.theoryMarkdown.split('\n\n').map((block, index) => {
           if (block.startsWith('### ')) {
@@ -111,11 +147,109 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
         })}
       </div>
 
-      {/* Assignment / Instructions Checklist */}
+      {/* Line-by-Line Code Breakdown */}
+      {lesson.codeBreakdown && lesson.codeBreakdown.length > 0 && (
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+              <Code2 className="h-4 w-4 text-sky-400" /> Line-by-Line Code Breakdown
+            </span>
+            <button
+              onClick={() => setShowBreakdown(!showBreakdown)}
+              className="text-[11px] text-slate-400 hover:text-slate-200"
+            >
+              {showBreakdown ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+
+          {showBreakdown && (
+            <div className="space-y-2 pt-1">
+              {lesson.codeBreakdown.map((item, idx) => (
+                <div key={idx} className="rounded-lg border border-slate-800/80 bg-slate-950 p-2.5 space-y-1">
+                  <div className="font-mono text-xs text-amber-300 bg-slate-900/80 px-2 py-1 rounded inline-block">
+                    {item.code}
+                  </div>
+                  <div className="text-xs text-slate-300">
+                    👉 <strong>What this does:</strong> {item.simpleMeaning}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Common Beginner Traps to Avoid */}
+      {lesson.commonMistakes && lesson.commonMistakes.length > 0 && (
+        <div className="rounded-xl border border-rose-900/40 bg-rose-950/15 p-4 space-y-2">
+          <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
+            <AlertTriangle className="h-4 w-4 text-rose-400" /> Common Traps to Watch Out For
+          </span>
+          <ul className="space-y-1.5 text-xs text-slate-300">
+            {lesson.commonMistakes.map((mistake, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="text-rose-400 font-bold">⚠️</span>
+                <span>{mistake}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Interactive Quick Check Mini-Quiz */}
+      {lesson.quickCheckQuiz && (
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/15 p-4 space-y-3">
+          <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+            <CheckCircle2 className="h-4 w-4" /> Quick Check: Test Your Mental Model
+          </span>
+          <p className="text-xs font-medium text-slate-200">
+            {lesson.quickCheckQuiz.question}
+          </p>
+
+          <div className="space-y-2">
+            {lesson.quickCheckQuiz.options.map((option, idx) => {
+              const isSelected = selectedQuizOption === idx;
+              const isCorrect = idx === lesson.quickCheckQuiz!.correctIndex;
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleSelectQuiz(idx)}
+                  className={`w-full text-left p-2.5 rounded-lg border text-xs transition-all cursor-pointer ${
+                    quizAnswered && isSelected
+                      ? isCorrect
+                        ? 'border-emerald-500 bg-emerald-950/50 text-emerald-200 font-semibold'
+                        : 'border-rose-500 bg-rose-950/50 text-rose-200'
+                      : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-slate-500">{String.fromCharCode(65 + idx)}.</span>
+                    <span>{option}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {quizAnswered && (
+            <div className={`text-xs p-2.5 rounded-lg ${
+              selectedQuizOption === lesson.quickCheckQuiz.correctIndex
+                ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-500/30'
+                : 'bg-rose-950/40 text-rose-300 border border-rose-500/30'
+            }`}>
+              {selectedQuizOption === lesson.quickCheckQuiz.correctIndex ? '🎉 Exactly right! ' : '💡 Not quite! '}
+              {lesson.quickCheckQuiz.explanation}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Quest Instructions Checklist */}
       <div className="rounded-lg border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-            <BookOpen className="h-4 w-4" /> Quest Instructions
+            <BookOpen className="h-4 w-4" /> Coding Mission Steps
           </h3>
           <span className="text-[11px] font-mono text-amber-300/80 tabular-nums">
             {checkedInstructions.length}/{lesson.instructions.length} completed
