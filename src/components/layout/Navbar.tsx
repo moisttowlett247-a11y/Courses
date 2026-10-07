@@ -14,7 +14,11 @@ import {
   Database,
   Terminal,
   Layers,
-  HelpCircle
+  HelpCircle,
+  Menu,
+  X,
+  ShieldCheck,
+  Sword
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -38,6 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [labsOpen, setLabsOpen] = useState(false);
   const [practiceOpen, setPracticeOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const xpPercent = Math.min(100, Math.round((userStats.currentXp / userStats.xpToNextLevel) * 100));
@@ -54,22 +59,37 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleMobileNav = (view: string) => {
+    onNavigate(view);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-slate-800 bg-slate-950/95 px-3 md:px-6 backdrop-blur">
-      {/* Zone 1: Single text element wordmark */}
-      <button 
-        onClick={() => onNavigate('curriculum')}
-        className="flex items-center gap-2 text-left group transition-transform active:scale-95 shrink-0"
-      >
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 font-bold shadow-sm shadow-amber-500/20">
-          <TerminalSquare className="h-5 w-5" />
-        </div>
-        <div className="flex flex-col">
-          <span className="font-fantasy text-lg font-bold tracking-wider text-amber-400 group-hover:text-amber-300 transition-colors">
-            BOOTFORGE
-          </span>
-        </div>
-      </button>
+    <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-slate-800 bg-slate-950/95 px-3 md:px-6 backdrop-blur relative">
+      {/* Zone 1: Mobile Hamburger + Logo */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 border border-slate-800"
+          title="Open Menu"
+        >
+          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </button>
+
+        <button 
+          onClick={() => onNavigate('curriculum')}
+          className="flex items-center gap-2 text-left group transition-transform active:scale-95 shrink-0"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-slate-950 font-bold shadow-sm shadow-amber-500/20">
+            <TerminalSquare className="h-5 w-5" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-fantasy text-lg font-bold tracking-wider text-amber-400 group-hover:text-amber-300 transition-colors">
+              BOOTFORGE
+            </span>
+          </div>
+        </button>
+      </div>
 
       {/* Zone 2: Navigation links */}
       <nav ref={dropdownRef} className="hidden md:flex items-center gap-4 lg:gap-5 text-xs font-medium text-slate-400">
@@ -295,6 +315,140 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </button>
       </div>
+
+      {/* Mobile Navigation Dropdown Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-slate-950 border-b border-slate-800 p-4 shadow-2xl z-50 flex flex-col gap-3 max-h-[80vh] overflow-y-auto">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Core Tracks</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <button
+              onClick={() => handleMobileNav('curriculum')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'curriculum'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <BookOpen className="h-4 w-4 text-amber-400 shrink-0" />
+              <span>Curriculum</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('certifications')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'certifications'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Certifications</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('boss-raids')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'boss-raids'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Sword className="h-4 w-4 text-rose-400 shrink-0" />
+              <span>Boss Raids</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('guilds')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'guilds'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Users className="h-4 w-4 text-sky-400 shrink-0" />
+              <span>Study Guilds</span>
+            </button>
+          </div>
+
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 pt-2 border-t border-slate-900">Practice Arena</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <button
+              onClick={() => handleMobileNav('bug-bounty')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'bug-bounty'
+                  ? 'bg-rose-500/15 border-rose-500/40 text-rose-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Bug className="h-4 w-4 text-rose-400 shrink-0" />
+              <span>Bug Bounty</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('flashcards')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'flashcards'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
+              <span>Flashcards</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('portfolio')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'portfolio'
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <FolderGit2 className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Portfolio</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('interview')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'interview'
+                  ? 'bg-sky-500/15 border-sky-500/40 text-sky-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <MessageSquare className="h-4 w-4 text-sky-400 shrink-0" />
+              <span>Mock Interview</span>
+            </button>
+          </div>
+
+          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 pt-2 border-t border-slate-900">Interactive Labs</div>
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <button
+              onClick={() => handleMobileNav('sql-playground')}
+              className="flex flex-col items-center gap-1 p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 text-center"
+            >
+              <Database className="h-4 w-4 text-cyan-400" />
+              <span className="text-[11px]">SQL Studio</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('terminal')}
+              className="flex flex-col items-center gap-1 p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 text-center"
+            >
+              <Terminal className="h-4 w-4 text-emerald-400" />
+              <span className="text-[11px]">Terminal</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('architecture')}
+              className="flex flex-col items-center gap-1 p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 text-center"
+            >
+              <Layers className="h-4 w-4 text-purple-400" />
+              <span className="text-[11px]">System Design</span>
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

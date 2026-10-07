@@ -472,6 +472,7 @@ export default function App() {
                     <TestResultsPanel
                       results={testResults}
                       isRunning={isRunning}
+                      onRun={handleRunCode}
                       onAskAIDiagnose={(err) => {
                         setAiDiagnoseMessage(err);
                         setIsArchmageAiOpen(true);
@@ -576,13 +577,18 @@ export default function App() {
       {/* Archmage AI Mentor Drawer */}
       <ArchmageAiDrawer
         isOpen={isArchmageAiOpen}
-        onClose={() => setIsArchmageAiOpen(false)}
+        onClose={() => {
+          setIsArchmageAiOpen(false);
+          setAiDiagnoseMessage(null);
+        }}
         currentLessonContext={{
           title: selectedLesson.title,
           language: selectedLesson.language,
           instructions: selectedLesson.instructions,
           currentCode: code
         }}
+        initialDiagnoseError={aiDiagnoseMessage}
+        onClearDiagnoseError={() => setAiDiagnoseMessage(null)}
         onApplyGeneratedQuest={handleApplyGeneratedQuest}
       />
 

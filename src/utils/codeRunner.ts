@@ -47,14 +47,30 @@ export const initialSqlDatabase = {
 // SQL Query Parser & Executor
 export function executeSqlQuery(query: string, customDb = initialSqlDatabase): { columns: string[]; rows: any[][]; count: number; error?: string } {
   try {
-    const cleanQuery = query.trim().replace(/;+$/, '');
+    // Strip line comments (-- ...) and block comments (/* ... */)
+    const stripped = (query || '')
+      .replace(/--.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .trim();
+
+    if (!stripped) {
+      return {
+        columns: ['error'],
+        rows: [],
+        count: 0,
+        error: 'No SQL query found. Write a SELECT statement to execute.'
+      };
+    }
+
+    const cleanQuery = stripped.replace(/;+$/, '').trim();
     const upper = cleanQuery.toUpperCase();
 
     if (!upper.startsWith('SELECT')) {
       return {
-        columns: ['status', 'query'],
-        rows: [['Query executed successfully', cleanQuery]],
-        count: 1
+        columns: ['error'],
+        rows: [],
+        count: 0,
+        error: `Only SELECT queries are supported in this interactive runner. Got: "${cleanQuery.slice(0, 30)}..."`
       };
     }
 
@@ -67,18 +83,26 @@ export function executeSqlQuery(query: string, customDb = initialSqlDatabase): {
     let data = JSON.parse(JSON.stringify((customDb as any)[table] || customDb.users));
 
     // Support JOIN
-    if (upper.includes('JOIN ORDERS') && table === 'users') {
+    if ((upper.includes('JOIN ORDERS') || upper.includes('INNER JOIN ORDERS')) && table === 'users') {
+      // In relational SQL, JOIN requires an ON condition (unless explicit CROSS JOIN)
+      if (!upper.includes(' ON ') && !upper.includes('CROSS JOIN')) {
+        throw new Error('SQL Syntax Error: JOIN requires an ON condition (e.g. JOIN orders ON users.id = orders.user_id)');
+      }
+
       const joined: any[] = [];
       data.forEach((u: any) => {
         const userOrders = customDb.orders.filter(o => o.user_id === u.id);
         userOrders.forEach(o => {
           joined.push({
+            id: u.id,
             user_id: u.id,
-            user_name: u.name,
-            email: u.email,
-            order_id: o.id,
+            name: u.name,
+            'users.name': u.name,
+            'orders.product': o.product,
             product: o.product,
+            'orders.amount': o.amount,
             amount: o.amount,
+            'orders.status': o.status,
             status: o.status
           });
         });
@@ -86,24 +110,49 @@ export function executeSqlQuery(query: string, customDb = initialSqlDatabase): {
       data = joined;
     }
 
+    // Helper to get row value with optional dot prefix (e.g. orders.status vs status)
+    const getRowValue = (row: any, key: string) => {
+      if (row[key] !== undefined) return row[key];
+      const stripped = key.includes('.') ? key.split('.').pop()! : key;
+      if (row[stripped] !== undefined) return row[stripped];
+      for (const k of Object.keys(row)) {
+        if (k.endsWith('.' + key) || k.endsWith('.' + stripped)) return row[k];
+      }
+      return undefined;
+    };
+
     // WHERE filter simulation
     if (upper.includes('WHERE')) {
       const wherePart = cleanQuery.split(/WHERE/i)[1].split(/ORDER|GROUP|LIMIT/i)[0].trim();
       
-      if (wherePart.includes('>')) {
+      if (wherePart.includes('>=')) {
+        const [field, val] = wherePart.split('>=').map(s => s.trim().replace(/['"]/g, ''));
+        const numVal = parseFloat(val);
+        data = data.filter((row: any) => parseFloat(getRowValue(row, field)) >= numVal);
+      } else if (wherePart.includes('<=')) {
+        const [field, val] = wherePart.split('<=').map(s => s.trim().replace(/['"]/g, ''));
+        const numVal = parseFloat(val);
+        data = data.filter((row: any) => parseFloat(getRowValue(row, field)) <= numVal);
+      } else if (wherePart.includes('>')) {
         const [field, val] = wherePart.split('>').map(s => s.trim().replace(/['"]/g, ''));
         const numVal = parseFloat(val);
-        data = data.filter((row: any) => parseFloat(row[field]) > numVal);
+        data = data.filter((row: any) => parseFloat(getRowValue(row, field)) > numVal);
       } else if (wherePart.includes('<')) {
         const [field, val] = wherePart.split('<').map(s => s.trim().replace(/['"]/g, ''));
         const numVal = parseFloat(val);
-        data = data.filter((row: any) => parseFloat(row[field]) < numVal);
+        data = data.filter((row: any) => parseFloat(getRowValue(row, field)) < numVal);
       } else if (wherePart.includes('=')) {
         const [field, val] = wherePart.split('=').map(s => s.trim().replace(/['"]/g, ''));
-        data = data.filter((row: any) => String(row[field]).toLowerCase() === val.toLowerCase());
+        data = data.filter((row: any) => {
+          const v = getRowValue(row, field);
+          return v !== undefined && String(v).toLowerCase() === val.toLowerCase();
+        });
       } else if (wherePart.toUpperCase().includes('LIKE')) {
         const [field, val] = wherePart.split(/LIKE/i).map(s => s.trim().replace(/['"%]/g, ''));
-        data = data.filter((row: any) => String(row[field]).toLowerCase().includes(val.toLowerCase()));
+        data = data.filter((row: any) => {
+          const v = getRowValue(row, field);
+          return v !== undefined && String(v).toLowerCase().includes(val.toLowerCase());
+        });
       }
     }
 
@@ -140,8 +189,8 @@ export function executeSqlQuery(query: string, customDb = initialSqlDatabase): {
       const orderCol = orderPart.replace(/ASC|DESC/gi, '').trim().split(' ')[0];
 
       data.sort((a: any, b: any) => {
-        const va = a[orderCol];
-        const vb = b[orderCol];
+        const va = getRowValue(a, orderCol);
+        const vb = getRowValue(b, orderCol);
         if (typeof va === 'number' && typeof vb === 'number') {
           return isDesc ? vb - va : va - vb;
         }
@@ -163,15 +212,24 @@ export function executeSqlQuery(query: string, customDb = initialSqlDatabase): {
 
     // SELECT columns
     const selectPart = cleanQuery.split(/FROM/i)[0].replace(/SELECT/i, '').trim();
-    let columns = Object.keys(data[0]);
+    let columns: string[] = [];
 
-    if (selectPart !== '*' && !selectPart.includes('COUNT(')) {
-      const requestedCols = selectPart.split(',').map(s => s.trim().split(' AS ')[0].split(' as ')[0].trim());
-      columns = requestedCols.filter(c => c in data[0] || c.includes('.'));
-      if (columns.length === 0) columns = Object.keys(data[0]);
+    if (selectPart === '*' || selectPart.includes('COUNT(')) {
+      columns = Object.keys(data[0]).filter(k => !k.includes('.'));
+    } else {
+      const requested = selectPart.split(',').map(s => s.trim().split(/\s+AS\s+/i)[0].trim());
+      columns = requested.map(col => {
+        if (col in data[0]) return col;
+        const stripped = col.includes('.') ? col.split('.').pop()! : col;
+        if (stripped in data[0]) return stripped;
+        return col;
+      });
     }
 
-    const rows = data.map((row: any) => columns.map(col => row[col] !== undefined ? row[col] : 'NULL'));
+    const rows = data.map((row: any) => columns.map(col => {
+      const val = getRowValue(row, col);
+      return val !== undefined ? val : 'NULL';
+    }));
 
     return { columns, rows, count: rows.length };
   } catch (err: any) {
@@ -183,6 +241,201 @@ export function executeSqlQuery(query: string, customDb = initialSqlDatabase): {
     };
   }
 }
+
+// Robust Python-to-JavaScript Transpiler
+export function transpilePythonToJs(userCode: string): string {
+  const lines = userCode.replace(/\r\n/g, '\n').split('\n');
+  const outputLines: string[] = [];
+  const indentStack: number[] = [];
+  let inClass = false;
+  let classIndent = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const trimmed = rawLine.trim();
+
+    // Preserve comments as JS comments
+    if (!trimmed || trimmed.startsWith('#')) {
+      if (trimmed.startsWith('#')) {
+        outputLines.push('// ' + trimmed.substring(1));
+      } else {
+        outputLines.push('');
+      }
+      continue;
+    }
+
+    // Measure indent of current non-empty code line
+    const indent = rawLine.search(/\S|$/);
+
+    // Pop closed indentation blocks
+    // Any block opened at an indentation level >= current indent is now closed
+    while (indentStack.length > 0 && indent <= indentStack[indentStack.length - 1]) {
+      const popped = indentStack.pop()!;
+      outputLines.push(' '.repeat(popped) + '}');
+      if (inClass && indent <= classIndent) {
+        inClass = false;
+      }
+    }
+
+    // Clean inline comments
+    let line = rawLine;
+    if (line.includes('#') && !line.includes('"#') && !line.includes("'#")) {
+      line = line.replace(/#.*$/, '');
+    }
+
+    // Convert Python f-strings
+    line = line.replace(/f(["'])([\s\S]*?)\1/g, (_, q, content) => {
+      return '`' + content.replace(/\{([^{}]+)\}/g, '${$1}') + '`';
+    });
+
+    // Strip type hints: def foo(x: int) -> int: -> def foo(x):
+    line = line.replace(/->\s*[a-zA-Z0-9_\[\],\s]+:/g, ':');
+    line = line.replace(/([a-zA-Z0-9_]+)\s*:\s*[a-zA-Z0-9_\[\]]+/g, '$1');
+
+    // Python inline ternary: `return A if COND else B` -> `return ((COND) ? (A) : (B))`
+    // Example: `return 'OPEN' if fail_count >= threshold else 'CLOSED'`
+    const ternaryMatch = line.match(/^(\s*)(return\s+)?(.*?)\s+if\s+(.*?)\s+else\s+(.*)$/);
+    if (ternaryMatch && !line.trim().endsWith(':')) {
+      const prefix = ternaryMatch[1] || '';
+      const returnKw = ternaryMatch[2] || '';
+      const valIfTrue = ternaryMatch[3];
+      const condition = ternaryMatch[4];
+      const valIfFalse = ternaryMatch[5];
+      line = `${prefix}${returnKw}((${condition}) ? (${valIfTrue}) : (${valIfFalse}))`;
+    }
+
+    // Python keyword & operator mapping (handle 'not in' before 'not')
+    line = line
+      .replace(/\bNone\b/g, 'null')
+      .replace(/\bTrue\b/g, 'true')
+      .replace(/\bFalse\b/g, 'false')
+      .replace(/\band\b/g, '&&')
+      .replace(/\bor\b/g, '||')
+      .replace(/([a-zA-Z0-9_\.]+)\s+not\s+in\s+([a-zA-Z0-9_\.]+)/g, '!($1 in $2)')
+      .replace(/\bnot\s+/g, '!')
+      .replace(/\bdel\s+([a-zA-Z0-9_\.\[\]'"]+)/g, 'delete $1')
+      .replace(/self\./g, 'this.');
+
+    // Python list.pop(index) -> arr.splice(index, 1)[0]
+    line = line.replace(/([a-zA-Z0-9_\.\[\]'"]+)\.pop\(([^)]+)\)/g, '$1.splice($2, 1)[0]');
+
+    // Python dict.get(key, default) / obj.get(key) -> safe _py_get helper
+    line = line.replace(/([a-zA-Z0-9_\.\[\]'"]+)\.get\((.*?)\)/g, '_py_get($1, $2)');
+
+    // Class header
+    const classMatch = line.match(/^\s*class\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?\s*:/);
+    if (classMatch) {
+      inClass = true;
+      classIndent = indent;
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `class ${classMatch[1]} {`);
+      continue;
+    }
+
+    // Function/method header (allow optional space before colon)
+    const defMatch = line.match(/^\s*def\s+([a-zA-Z0-9_]+)\s*\((.*?)\)\s*:/);
+    if (defMatch) {
+      const name = defMatch[1];
+      let params = defMatch[2].split(',').map(p => p.trim()).filter(Boolean);
+      params = params.filter(p => p !== 'self' && p !== 'this');
+      const paramsStr = params.join(', ');
+
+      indentStack.push(indent);
+      if (inClass && indent > classIndent) {
+        if (name === '__init__') {
+          outputLines.push(' '.repeat(indent) + `constructor(${paramsStr}) {`);
+        } else {
+          outputLines.push(' '.repeat(indent) + `${name}(${paramsStr}) {`);
+        }
+      } else {
+        outputLines.push(' '.repeat(indent) + `function ${name}(${paramsStr}) {`);
+      }
+      continue;
+    }
+
+    // Loops (match before general 'in' replacement)
+    const forRangeMatch = line.match(/^\s*for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\)\s*:/);
+    if (forRangeMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `for (let ${forRangeMatch[1]} of range(${forRangeMatch[2]})) {`);
+      continue;
+    }
+
+    const forInMatch = line.match(/^\s*for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?)\s*:/);
+    if (forInMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `for (let ${forInMatch[1]} of ${forInMatch[2]}) {`);
+      continue;
+    }
+
+    // Now safe to replace general 'in' operator: `a in b` -> `(a in b)`
+    line = line.replace(/([a-zA-Z0-9_\.]+)\s+in\s+([a-zA-Z0-9_\.]+)/g, '($1 in $2)');
+
+    // If/Elif/Else
+    const ifMatch = line.match(/^\s*if\s+(.*?)\s*:/);
+    if (ifMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `if (${ifMatch[1]}) {`);
+      continue;
+    }
+
+    const elifMatch = line.match(/^\s*elif\s+(.*?)\s*:/);
+    if (elifMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `else if (${elifMatch[1]}) {`);
+      continue;
+    }
+
+    const elseMatch = line.match(/^\s*else\s*:/);
+    if (elseMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `else {`);
+      continue;
+    }
+
+    const whileMatch = line.match(/^\s*while\s+(.*?)\s*:/);
+    if (whileMatch) {
+      indentStack.push(indent);
+      outputLines.push(' '.repeat(indent) + `while (${whileMatch[1]}) {`);
+      continue;
+    }
+
+    // Pass
+    if (/^\s*pass\s*$/.test(line)) {
+      outputLines.push(' '.repeat(indent) + '/* pass */');
+      continue;
+    }
+
+    // Local variable assignments (declare with var to avoid strict mode ReferenceError in classes)
+    const assignMatch = line.match(/^(\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*=(?!=)\s*(.*)$/);
+    if (assignMatch && !line.includes('return ') && !line.trim().startsWith('for ') && !line.trim().startsWith('if ')) {
+      line = `${assignMatch[1]}var ${assignMatch[2]} = ${assignMatch[3]}`;
+    }
+
+    outputLines.push(line);
+  }
+
+  // Close remaining open indentations
+  while (indentStack.length > 0) {
+    const popped = indentStack.pop()!;
+    outputLines.push(' '.repeat(popped) + '}');
+  }
+
+  return outputLines.join('\n');
+}
+
+// Virtual file system for simulated shell
+const virtualFs: Record<string, string> = {
+  'server.log': `[2026-10-06 12:00:01] INFO  Starting HTTP gateway on port :8080
+[2026-10-06 12:00:02] INFO  Database connection pool established (pool_size=20)
+[2026-10-06 12:00:05] WARN  High latency detected on Redis replica (latency=42ms)
+[2026-10-06 12:00:10] ERROR ConnectionTimeout: upstream auth microservice timed out after 5000ms
+[2026-10-06 12:00:11] ERROR DeadlockDetected: transaction 891 aborted by deadlock detector
+[2026-10-06 12:00:15] ERROR OutOfMemory: worker thread 4 killed by OOM killer
+[2026-10-06 12:00:18] INFO  Graceful recovery initiated on worker thread 4`,
+  'config.yaml': `server:\n  port: 8080\n  environment: production`,
+  'access.log': `127.0.0.1 - GET /index.html 200\n10.0.0.4 - GET /api/v1/auth 404\n10.0.0.5 - GET /missing 404`
+};
 
 // Interactive Code Runner (Python, Go, JS, SQL, Bash)
 export async function runInteractiveCode(
@@ -226,7 +479,7 @@ export async function runInteractiveCode(
     }
 
     if (language === 'python') {
-      // Python simulated sandbox compiler
+      // Python simulated runtime environment
       const pyRuntime = `
         const print = mockConsole.log;
         const len = (x) => (x ? (x.length !== undefined ? x.length : Object.keys(x).length) : 0);
@@ -248,56 +501,26 @@ export async function runInteractiveCode(
         const False = false;
         const None = null;
 
-        // Python string & object helpers
-        if (!String.prototype.upper) String.prototype.upper = function() { return this.toUpperCase(); };
-        if (!String.prototype.lower) String.prototype.lower = function() { return this.toLowerCase(); };
-        if (!String.prototype.strip) String.prototype.strip = function() { return this.trim(); };
+        // Python string & array helpers (non-enumerable to prevent for..in loops from enumerating them)
+        if (!String.prototype.upper) Object.defineProperty(String.prototype, 'upper', { value: function() { return this.toUpperCase(); }, configurable: true, writable: true, enumerable: false });
+        if (!String.prototype.lower) Object.defineProperty(String.prototype, 'lower', { value: function() { return this.toLowerCase(); }, configurable: true, writable: true, enumerable: false });
+        if (!String.prototype.strip) Object.defineProperty(String.prototype, 'strip', { value: function() { return this.trim(); }, configurable: true, writable: true, enumerable: false });
+
+        if (!Array.prototype.append) Object.defineProperty(Array.prototype, 'append', { value: function(x) { this.push(x); return this; }, configurable: true, writable: true, enumerable: false });
+        if (!Array.prototype.remove) Object.defineProperty(Array.prototype, 'remove', { value: function(x) { const i = this.indexOf(x); if (i !== -1) this.splice(i, 1); return this; }, configurable: true, writable: true, enumerable: false });
+
+        // Safe dict/class .get() helper - never pollute Object.prototype directly!
+        const _py_get = (target, key, defaultVal = null) => {
+          if (target === null || target === undefined) return defaultVal;
+          if (typeof target.get === 'function') return target.get(key, defaultVal);
+          return target[key] !== undefined ? target[key] : defaultVal;
+        };
       `;
 
-      // Convert common Python syntax to JS for immediate browser evaluation
-      let jsCode = userCode;
+      // Transpile user Python code cleanly to JS
+      const jsCode = transpilePythonToJs(userCode);
 
-      // Handle Python comments
-      jsCode = jsCode.replace(/#.*$/gm, '//');
-
-      // Handle Python f-strings: f"hello {name}" -> `hello ${name}`
-      jsCode = jsCode.replace(/f(["'])([\s\S]*?)\1/g, (_, q, content) => {
-        return '`' + content.replace(/\{([^{}]+)\}/g, '${$1}') + '`';
-      });
-
-      // Handle Python keywords and operators
-      jsCode = jsCode
-        .replace(/\bNone\b/g, 'null')
-        .replace(/\bTrue\b/g, 'true')
-        .replace(/\bFalse\b/g, 'false')
-        .replace(/\band\b/g, '&&')
-        .replace(/\bor\b/g, '||')
-        .replace(/\bnot\s+/g, '!')
-        .replace(/self\./g, 'this.')
-        .replace(/__init__\s*\(this,?\s*/g, 'constructor(')
-        .replace(/__str__\s*\(this\)/g, 'toString()')
-        .replace(/\.append\(/g, '.push(');
-
-      // Handle Python block headers
-      jsCode = jsCode
-        .replace(/def\s+([a-zA-Z0-9_]+)\s*\((.*?)\):/g, 'function $1($2) {')
-        .replace(/class\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?:/g, 'class $1 {')
-        .replace(/elif\s+(.*?):/g, '} else if ($1) {')
-        .replace(/if\s+(.*?):/g, 'if ($1) {')
-        .replace(/else:/g, '} else {')
-        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+range\((.*?)\):/g, 'for (let $1 of range($2)) {')
-        .replace(/for\s+([a-zA-Z0-9_]+)\s+in\s+(.*?):/g, 'for (let $1 of $2) {')
-        .replace(/while\s+(.*?):/g, 'while ($1) {')
-        .replace(/^\s*pass\s*$/gm, '/* pass */');
-
-      // Auto-close open braces based on indentation or heuristic
-      const openCount = (jsCode.match(/\{/g) || []).length;
-      const closeCount = (jsCode.match(/\}/g) || []).length;
-      if (openCount > closeCount) {
-        jsCode += '\n' + '}'.repeat(openCount - closeCount);
-      }
-
-      // Check for top-level syntax/compilation errors
+      // Check for syntax errors
       let hasCompileError = false;
       let compileErrorMsg = '';
       try {
@@ -327,67 +550,157 @@ export async function runInteractiveCode(
         }
 
         try {
-          // Extract the function call expression accurately
-          let callExpression = '';
-          let fnName = '';
-
-          // 1. Check if tc.inputDescription contains a function call like foo(...)
-          if (tc.inputDescription) {
-            const descMatch = tc.inputDescription.trim().match(/^([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)$/);
-            if (descMatch) {
-              fnName = descMatch[1];
-              callExpression = `${fnName}(${descMatch[2]})`;
-            }
-          }
-
-          // 2. Check if tc.name contains a function call like foo(...)
-          if (!callExpression && tc.name) {
-            const nameMatch = tc.name.match(/([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)/);
-            if (nameMatch) {
-              fnName = nameMatch[1];
-              callExpression = `${fnName}(${nameMatch[2]})`;
-            }
-          }
-
-          // 3. Check function defined in userCode if still no call found
-          if (!callExpression) {
-            const defMatch = userCode.match(/def\s+([a-zA-Z0-9_]+)/);
-            if (defMatch) {
-              fnName = defMatch[1];
-              if (tc.input !== undefined) {
-                const argsStr = Array.isArray(tc.input)
-                  ? tc.input.map((a: any) => JSON.stringify(a)).join(', ')
-                  : JSON.stringify(tc.input);
-                callExpression = `${fnName}(${argsStr})`;
-              } else {
-                callExpression = `${fnName}()`;
-              }
-            }
-          }
-
-          // Execute function call if identified
-          if (callExpression && fnName) {
+          // Special Class Suite: RateLimiter
+          if (tc.id === 'py-t3' || tc.name.toLowerCase().includes('ratelimiter')) {
             const runnerBody = `
               ${pyRuntime}
               ${jsCode}
-              if (typeof ${fnName} === 'function') {
-                return ${callExpression};
+              if (typeof RateLimiter === 'function') {
+                const rl = new RateLimiter(2);
+                const r1 = rl.allow_request('10.0.0.1');
+                const r2 = rl.allow_request('10.0.0.1');
+                const r3 = rl.allow_request('10.0.0.1');
+                rl.reset('10.0.0.1');
+                const r4 = rl.allow_request('10.0.0.1');
+                if (r1 === true && r2 === true && r3 === false && r4 === true) {
+                  return 'RateLimiter verified';
+                }
+                return \`RateLimiter mismatch: r1=\${r1}, r2=\${r2}, r3=\${r3}, r4=\${r4}\`;
+              }
+              return 'Class RateLimiter not found';
+            `;
+            const runnerFn = new Function('mockConsole', runnerBody);
+            actual = runnerFn(mockConsole);
+          }
+          // Special Class Suite: LRUCache
+          else if (tc.id === 'dsa-t1' || tc.name.toLowerCase().includes('lru')) {
+            const runnerBody = `
+              ${pyRuntime}
+              ${jsCode}
+              if (typeof LRUCache === 'function') {
+                const lru = new LRUCache(2);
+                lru.put('a', 1);
+                lru.put('b', 2);
+                const g1 = lru.get('a');
+                lru.put('c', 3);
+                const g2 = lru.get('b');
+                const g3 = lru.get('c');
+                if (g1 === 1 && g2 === -1 && g3 === 3) {
+                  return 'LRU operations valid';
+                }
+                return \`LRU mismatch: g1=\${g1}, g2=\${g2}, g3=\${g3}\`;
+              }
+              return 'Class LRUCache not found';
+            `;
+            const runnerFn = new Function('mockConsole', runnerBody);
+            actual = runnerFn(mockConsole);
+          }
+          // Special Boss Suite: ConnectionPoolGuard
+          else if (tc.id === 'boss-p2-t1' || tc.name.toLowerCase().includes('connectionpoolguard')) {
+            const runnerBody = `
+              ${pyRuntime}
+              ${jsCode}
+              if (typeof ConnectionPoolGuard === 'function') {
+                const g = new ConnectionPoolGuard(2);
+                const a1 = g.acquire();
+                const a2 = g.acquire();
+                const a3 = g.acquire();
+                g.release();
+                const a4 = g.acquire();
+                if (a1 === true && a2 === true && a3 === false && a4 === true) {
+                  return 'Connection pool guarded';
+                }
+                return 'Connection pool guard mismatch';
+              }
+              return 'Class ConnectionPoolGuard not found';
+            `;
+            const runnerFn = new Function('mockConsole', runnerBody);
+            actual = runnerFn(mockConsole);
+          }
+          // Special Boss Suite: process_dragon_orders
+          else if (tc.id === 'boss-p1-t1') {
+            const runnerBody = `
+              ${pyRuntime}
+              ${jsCode}
+              if (typeof process_dragon_orders === 'function') {
+                return process_dragon_orders([101, 102], {});
               }
               return undefined;
             `;
             const runnerFn = new Function('mockConsole', runnerBody);
             actual = runnerFn(mockConsole);
-          } else {
-            // Top-level prints or script execution
-            actual = logs.length > 0 ? logs[logs.length - 1] : 'Code executed';
+          }
+          // Standard Function Call Resolution
+          else {
+            let callExpression = '';
+            let fnName = '';
+
+            // 1. Check inputDescription: `fn(args)`
+            if (tc.inputDescription) {
+              const descMatch = tc.inputDescription.trim().match(/^([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)$/);
+              if (descMatch) {
+                fnName = descMatch[1];
+                callExpression = `${fnName}(${descMatch[2]})`;
+              }
+            }
+
+            // 2. Check tc.name: `fn(args)`
+            if (!callExpression && tc.name) {
+              const nameMatch = tc.name.match(/([a-zA-Z0-9_]+)\s*\(([\s\S]*?)\)/);
+              if (nameMatch) {
+                fnName = nameMatch[1];
+                callExpression = `${fnName}(${nameMatch[2]})`;
+              }
+            }
+
+            // 3. Fallback: Parse kwargs from inputDescription like `health=50` or `a=50, b=15`
+            if (!callExpression && tc.inputDescription) {
+              const defMatch = userCode.match(/def\s+([a-zA-Z0-9_]+)/);
+              if (defMatch) {
+                fnName = defMatch[1];
+                const rawArgs = tc.inputDescription.split(',').map((s: string) => {
+                  const part = s.trim();
+                  if (part.includes('=')) {
+                    const val = part.split('=')[1].trim();
+                    return val;
+                  }
+                  return part;
+                });
+                callExpression = `${fnName}(${rawArgs.join(', ')})`;
+              }
+            }
+
+            // 4. Default: Find first defined function
+            if (!callExpression) {
+              const defMatch = userCode.match(/def\s+([a-zA-Z0-9_]+)/);
+              if (defMatch) {
+                fnName = defMatch[1];
+                callExpression = `${fnName}()`;
+              }
+            }
+
+            if (callExpression && fnName) {
+              const runnerBody = `
+                ${pyRuntime}
+                ${jsCode}
+                if (typeof ${fnName} === 'function') {
+                  return ${callExpression};
+                }
+                return undefined;
+              `;
+              const runnerFn = new Function('mockConsole', runnerBody);
+              actual = runnerFn(mockConsole);
+            } else {
+              actual = logs.length > 0 ? logs[logs.length - 1] : 'Code executed';
+            }
           }
 
-          // If function returned nothing, but printed to console, check if output was logged
+          // Fallback to logged print output if function returned undefined
           if (actual === undefined && logs.length > 0) {
             actual = logs[logs.length - 1];
           }
 
-          // Evaluate pass / fail
+          // Evaluate equality
           if (typeof tc.expectedOutput === 'object' && tc.expectedOutput !== null) {
             passed = JSON.stringify(actual) === JSON.stringify(tc.expectedOutput);
           } else if (typeof tc.expectedOutput === 'number') {
@@ -399,16 +712,6 @@ export async function runInteractiveCode(
             const expStr = String(tc.expectedOutput ?? '').trim();
             passed = actStr === expStr || logs.some(l => l.trim() === expStr);
           }
-
-          // Heuristic solution fallback
-          if (!passed && solutionCode) {
-            const normUser = userCode.replace(/#[^\n]*/g, '').replace(/\s+/g, ' ').trim();
-            const normSol = solutionCode.replace(/#[^\n]*/g, '').replace(/\s+/g, ' ').trim();
-            if (normUser.includes(normSol) || normSol.includes(normUser)) {
-              passed = true;
-              actual = tc.expectedOutput;
-            }
-          }
         } catch (e: any) {
           errStr = e.message;
           actual = `Runtime Exception: ${e.message}`;
@@ -418,7 +721,7 @@ export async function runInteractiveCode(
           id: tc.id || `test-${idx}`,
           name: tc.name || `Assertion ${idx + 1}`,
           passed,
-          input: tc.inputDescription || (typeof tc.input === 'object' ? JSON.stringify(tc.input) : String(tc.input || '')),
+          input: tc.inputDescription || '',
           expected: tc.expectedOutput,
           actual: actual !== undefined ? actual : 'None',
           error: errStr
@@ -436,17 +739,13 @@ export async function runInteractiveCode(
     }
 
     if (language === 'go') {
-      // Go Language Runner & Simulator
       logs.push(`=== RUN   TestGoPackage`);
       
-      // Parse Go function / concurrency constructs
-      let passed = true;
       const testResults = testCases.map((tc, idx) => {
         let actual: any = null;
         let testPassed = false;
         let errorMsg: string | undefined = undefined;
 
-        // Check syntax presence of Go types, structs, goroutines
         const hasCorrectSyntax = userCode.includes('func ') && !userCode.includes('def ');
         
         if (!hasCorrectSyntax) {
@@ -455,42 +754,52 @@ export async function runInteractiveCode(
             name: tc.name || `Go Unit Test ${idx + 1}`,
             passed: false,
             expected: tc.expectedOutput,
-            actual: "Syntax Error: Go syntax requires 'func' declarations",
+            actual: "Syntax Error: Go requires 'func' syntax",
             error: "Go compiler error"
           };
         }
 
-        // Simulate Go execution
-        if (userCode.includes('go ') || userCode.includes('chan ') || userCode.includes('sync.WaitGroup')) {
+        // Concurrency & Logic verification
+        if (userCode.includes('DistributeTasks')) {
+          if (!userCode.includes('close(')) {
+            testPassed = false;
+            errorMsg = 'fatal error: all goroutines are asleep - deadlock! Channel was never closed.';
+            actual = errorMsg;
+            logs.push(`[panic] fatal error: all goroutines are asleep - deadlock!`);
+          } else {
+            testPassed = true;
+            actual = tc.expectedOutput;
+            logs.push(`[channel] channel closed cleanly, range loop terminated`);
+          }
+        } else if (userCode.includes('OrderLocks')) {
+          if (userCode.includes('return 0, 0') || (!userCode.includes('<') && !userCode.includes('>'))) {
+            testPassed = false;
+            actual = 'OrderLocks did not compare lock IDs';
+          } else {
+            testPassed = true;
+            actual = tc.expectedOutput;
+          }
+        } else if (userCode.includes('SafeChannelReceive')) {
+          if (!userCode.includes('select') || userCode.includes('return ""')) {
+            testPassed = false;
+            actual = 'SafeChannelReceive did not use non-blocking select';
+          } else {
+            testPassed = true;
+            actual = tc.expectedOutput;
+          }
+        } else if (userCode.includes('go ') || userCode.includes('chan ') || userCode.includes('sync.WaitGroup')) {
           logs.push(`[goroutine] spawned background worker`);
-          logs.push(`[channel] message sent successfully`);
+          logs.push(`[channel] message passed through channel`);
           logs.push(`[sync.WaitGroup] all routines completed`);
           actual = tc.expectedOutput;
-          testPassed = true;
-        } else if (userCode.includes('struct') || userCode.includes('interface')) {
-          logs.push(`[typecheck] struct allocation OK`);
+          testPassed = !userCode.includes('// TODO');
+        } else if (userCode.includes('struct') || userCode.includes('func (')) {
+          logs.push(`[typecheck] struct and methods allocated`);
           actual = tc.expectedOutput;
-          testPassed = true;
+          testPassed = !userCode.includes('// TODO');
         } else {
-          // Standard function check
           actual = tc.expectedOutput;
-          testPassed = true;
-        }
-
-        // Verify with solution logic
-        if (solutionCode) {
-          const coreSolutionLines = solutionCode
-            .split('\n')
-            .filter(l => l.trim().length > 6 && !l.startsWith('//') && !l.includes('package'));
-          const matches = coreSolutionLines.filter(line => userCode.includes(line.trim()));
-          if (matches.length < Math.min(2, coreSolutionLines.length)) {
-            // Check if user just left starter template untouched
-            if (userCode.includes('// TODO') || userCode.includes('panic("not implemented")')) {
-              testPassed = false;
-              actual = 'panic: not implemented';
-              errorMsg = 'TODO item not completed';
-            }
-          }
+          testPassed = !userCode.includes('// TODO');
         }
 
         return {
@@ -499,7 +808,7 @@ export async function runInteractiveCode(
           passed: testPassed,
           input: tc.inputDescription || 'Go test input',
           expected: tc.expectedOutput,
-          actual: actual || 'nil',
+          actual: testPassed ? tc.expectedOutput : 'Failed: incomplete implementation',
           error: errorMsg
         };
       });
@@ -508,7 +817,6 @@ export async function runInteractiveCode(
       if (allPassed) {
         logs.push(`--- PASS: TestGoPackage (0.02s)`);
         logs.push(`PASS`);
-        logs.push(`ok  \tbootforge/backend\t0.038s`);
       } else {
         logs.push(`--- FAIL: TestGoPackage (0.01s)`);
         logs.push(`FAIL`);
@@ -523,14 +831,78 @@ export async function runInteractiveCode(
       };
     }
 
-    // Default / Bash / Docker / General
-    const testResults = testCases.map((tc, idx) => ({
-      id: tc.id || `test-${idx}`,
-      name: tc.name || `Verification Step ${idx + 1}`,
-      passed: userCode.trim().length > 10 && !userCode.includes('TODO'),
-      expected: tc.expectedOutput,
-      actual: tc.expectedOutput
-    }));
+    if (language === 'bash') {
+      // Real Bash & Unix Pipeline Simulator
+      const cleanCmd = userCode.trim().replace(/^#.*$/gm, '').trim();
+      let actualOutput = '';
+      let isError = false;
+
+      const pipeParts = cleanCmd.split('|').map(s => s.trim());
+      const baseCmd = pipeParts[0];
+
+      if (baseCmd.startsWith('cat')) {
+        const fileName = baseCmd.replace('cat', '').trim();
+        let fileContent = virtualFs[fileName];
+
+        if (!fileContent) {
+          actualOutput = `cat: ${fileName}: No such file or directory`;
+          isError = true;
+        } else {
+          let piped = fileContent.split('\n');
+          for (let i = 1; i < pipeParts.length; i++) {
+            const p = pipeParts[i];
+            if (p.startsWith('grep')) {
+              const term = p.replace('grep', '').trim().replace(/['"]/g, '');
+              piped = piped.filter(line => line.includes(term));
+            } else if (p.startsWith('wc -l')) {
+              piped = [String(piped.length)];
+            } else if (p === 'sort') {
+              piped = piped.sort();
+            }
+          }
+          actualOutput = piped.join('\n').trim();
+        }
+      } else {
+        actualOutput = `Executed: ${cleanCmd}`;
+      }
+
+      logs.push(actualOutput);
+
+      const testResults = testCases.map((tc, idx) => {
+        const expected = String(tc.expectedOutput ?? '').trim();
+        const passed = !isError && (actualOutput === expected || actualOutput.includes(expected));
+        return {
+          id: tc.id || `test-${idx}`,
+          name: tc.name || `Pipeline Test ${idx + 1}`,
+          passed,
+          expected: tc.expectedOutput,
+          actual: actualOutput,
+          error: isError ? actualOutput : undefined
+        };
+      });
+
+      return {
+        success: testResults.every(t => t.passed),
+        output: actualOutput,
+        logs,
+        executionTimeMs: Math.max(1, Math.round(performance.now() - startTime)),
+        testResults
+      };
+    }
+
+    // Default general runner
+    const testResults = testCases.map((tc, idx) => {
+      const isTodo = userCode.includes('TODO');
+      const isComplete = userCode.trim().length > 15 && !isTodo;
+      return {
+        id: tc.id || `test-${idx}`,
+        name: tc.name || `Verification Step ${idx + 1}`,
+        passed: isComplete,
+        expected: tc.expectedOutput,
+        actual: isComplete ? tc.expectedOutput : (isTodo ? 'Pending TODO implementation' : 'Incomplete configuration'),
+        error: !isComplete ? (isTodo ? 'Unresolved TODO comment: replace placeholders with verified topology' : 'Configuration incomplete') : undefined
+      };
+    });
 
     return {
       success: testResults.every(t => t.passed),

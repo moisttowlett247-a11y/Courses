@@ -1099,9 +1099,11 @@ Architect high-concurrency systems with HAProxy, stateless pods, Redis cache, an
               "Connect: Client Fleet -> Load Balancer -> Web Replicas -> Redis -> PostgreSQL.",
               "Simulate 10,000 RPS load!"
             ],
-            starterCode: `// Launch the interactive architecture simulator to test scaling
+            starterCode: `// TODO: Connect horizontal cluster architecture components:
+// Client Fleet -> Load Balancer -> Web Replicas -> Redis Cache -> PostgreSQL
 `,
-            solutionCode: `// Architecture topology verified
+            solutionCode: `// Architecture Topology: Client Fleet -> Load Balancer -> Web Replicas -> Redis Cache -> PostgreSQL
+// Verified sub-50ms latency across 10,000 simulated RPS
 `,
             testCases: [
               {

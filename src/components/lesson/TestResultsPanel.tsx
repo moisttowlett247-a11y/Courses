@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { ExecutionResult } from '../../utils/codeRunner';
-import { CheckCircle2, XCircle, Clock, Terminal, Table as TableIcon, Sparkles, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, Terminal, Table as TableIcon, Sparkles, AlertTriangle, Play } from 'lucide-react';
 
 interface TestResultsPanelProps {
   results: ExecutionResult | null;
   isRunning: boolean;
   onAskAIDiagnose?: (errorMessage: string) => void;
+  onRun?: () => void;
 }
 
 export const TestResultsPanel: React.FC<TestResultsPanelProps> = ({
   results,
   isRunning,
-  onAskAIDiagnose
+  onAskAIDiagnose,
+  onRun
 }) => {
   const [activeTab, setActiveTab] = useState<'tests' | 'console' | 'table'>('tests');
 
@@ -28,11 +30,20 @@ export const TestResultsPanel: React.FC<TestResultsPanelProps> = ({
 
   if (!results) {
     return (
-      <div className="flex h-36 items-center justify-center border-t border-slate-800 bg-slate-950/60 text-slate-500 text-xs">
+      <div className="flex h-36 flex-col items-center justify-center border-t border-slate-800 bg-slate-950/60 text-slate-500 text-xs gap-2">
         <div className="flex items-center gap-1.5 font-mono">
           <Terminal className="h-4 w-4 text-slate-600" />
-          <span>Press "Run Code" or ⌘+Enter to execute test suite</span>
+          <span>Ready to execute backend test suite</span>
         </div>
+        {onRun && (
+          <button
+            onClick={onRun}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md font-medium cursor-pointer transition-colors"
+          >
+            <Play className="h-3.5 w-3.5 fill-amber-300" />
+            <span>Run Code & Verify</span>
+          </button>
+        )}
       </div>
     );
   }
