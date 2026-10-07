@@ -111,17 +111,37 @@ ORDER BY count DESC;`
 
           {/* Table Schema Columns */}
           <div className="rounded-lg border border-slate-800 bg-slate-900/50 p-3">
-            <span className="text-[10px] font-mono font-semibold text-emerald-400 block mb-1.5">
-              TABLE: {activeSchemaTable}
-            </span>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-mono font-semibold text-emerald-400 block">
+                TABLE: {activeSchemaTable}
+              </span>
+              <button
+                onClick={() => {
+                  const selectAll = `SELECT * FROM ${activeSchemaTable};`;
+                  setQuery(selectAll);
+                  setQueryResult(executeSqlQuery(selectAll));
+                }}
+                className="text-[10px] text-emerald-400 hover:text-emerald-300 font-mono underline cursor-pointer"
+              >
+                SELECT *
+              </button>
+            </div>
             <div className="space-y-1 text-xs font-mono text-slate-300">
               {Object.keys((initialSqlDatabase as any)[activeSchemaTable][0] || {}).map((col) => (
-                <div key={col} className="flex justify-between text-[11px] text-slate-400">
+                <button
+                  key={col}
+                  onClick={() => {
+                    playSound('key');
+                    setQuery(prev => prev + (prev.trim().endsWith(',') || prev.trim().endsWith('SELECT') ? ` ${col}` : `, ${col}`));
+                  }}
+                  title={`Click to insert "${col}" into query`}
+                  className="w-full flex justify-between text-[11px] text-slate-400 hover:text-emerald-300 hover:bg-slate-800/60 px-1 py-0.5 rounded cursor-pointer transition-colors"
+                >
                   <span>{col}</span>
                   <span className="text-slate-600 text-[10px]">
                     {typeof (initialSqlDatabase as any)[activeSchemaTable][0][col]}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </div>

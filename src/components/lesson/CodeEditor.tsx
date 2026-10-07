@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Copy, Check, Terminal, Sparkles, Code2, AlertCircle } from 'lucide-react';
+import { Play, RotateCcw, Copy, Check, Terminal, Sparkles, Code2, AlertCircle, Info } from 'lucide-react';
 import { playSound } from '../../utils/soundEffects';
+import { lintUserCode } from '../../utils/syntaxLinter';
 
 interface CodeEditorProps {
   code: string;
@@ -31,6 +32,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const lines = code.split('\n');
+  const lintWarnings = lintUserCode(language, code);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -128,6 +130,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Gentle Syntax Lint Warning Bar */}
+      {lintWarnings.length > 0 && (
+        <div className="bg-amber-950/40 border-b border-amber-500/30 px-3 py-1 flex items-center gap-2 text-[11px] text-amber-200 font-sans shrink-0">
+          <AlertCircle className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+          <span className="truncate flex-1 font-medium">{lintWarnings[0].message}</span>
+        </div>
+      )}
 
       {/* Code Editor Body */}
       <div className="relative flex-1 flex overflow-hidden font-mono text-xs leading-5">

@@ -12,6 +12,7 @@ interface ArchmageAiDrawerProps {
     currentCode: string;
   };
   initialDiagnoseError?: string | null;
+  lastTestResults?: any;
   onClearDiagnoseError?: () => void;
   onApplyGeneratedQuest?: (quest: any) => void;
 }
@@ -21,6 +22,7 @@ export const ArchmageAiDrawer: React.FC<ArchmageAiDrawerProps> = ({
   onClose,
   currentLessonContext,
   initialDiagnoseError,
+  lastTestResults,
   onClearDiagnoseError,
   onApplyGeneratedQuest
 }) => {
@@ -117,7 +119,7 @@ export const ArchmageAiDrawer: React.FC<ArchmageAiDrawerProps> = ({
           language: currentLessonContext?.language || 'Python',
           instructions: currentLessonContext?.instructions?.join('\n') || textToSend,
           currentCode: currentLessonContext?.currentCode || '',
-          testResults: textToSend
+          testResults: lastTestResults || null
         })
       });
 
@@ -237,6 +239,14 @@ export const ArchmageAiDrawer: React.FC<ArchmageAiDrawerProps> = ({
 
       {/* Quick Prompts Bar */}
       <div className="p-2.5 border-b border-slate-800/80 bg-slate-900/30 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+        {lastTestResults && !lastTestResults.success && (
+          <button
+            onClick={() => handleSendMessage("Can you analyze my failed test results and explain conceptually what invariant or logic branch went wrong?")}
+            className="whitespace-nowrap px-2.5 py-1 rounded bg-rose-950/60 border border-rose-500/50 text-rose-300 hover:text-white transition-colors cursor-pointer font-semibold animate-pulse"
+          >
+            🔍 Why did tests fail?
+          </button>
+        )}
         <button
           onClick={() => handleSendMessage("Can you give me a conceptual hint on how to solve this challenge without writing the full code?")}
           className="whitespace-nowrap px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-300 hover:border-amber-500/40 transition-colors cursor-pointer"

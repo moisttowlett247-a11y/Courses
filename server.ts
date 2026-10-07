@@ -21,23 +21,34 @@ if (apiKey) {
   ai = new GoogleGenAI({ apiKey });
 }
 
+// Helper to bound AI latency and never hang the UI
+function withTimeout<T>(promise: Promise<T>, ms: number = 1800): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('AI request timeout')), ms))
+  ]);
+}
+
 // Robust Gemini API Invocation with Model Fallback & Heuristic Companion
 async function callGeminiWithFallback(prompt: string, isJson: boolean = false): Promise<string | null> {
   if (!ai) return null;
 
-  const models = ['gemini-3.8-flash', 'gemini-flash-latest'];
+  const models = ['gemini-3.8-flash'];
   for (const model of models) {
     try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: isJson ? { responseMimeType: 'application/json' } : undefined
-      });
+      const response = await withTimeout(
+        ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: isJson ? { responseMimeType: 'application/json' } : undefined
+        }),
+        1800
+      );
       if (response && response.text) {
         return response.text;
       }
     } catch (err: any) {
-      console.warn(`[Gemini] Model ${model} unavailable: ${err.message || err}`);
+      console.warn(`[Gemini] Model ${model} unavailable or timed out: ${err.message || err}`);
     }
   }
   return null;

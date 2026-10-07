@@ -20,7 +20,8 @@ export const VisualCodeStepper: React.FC<VisualCodeStepperProps> = ({
   language,
   onClose
 }) => {
-  const lines = code.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('#'));
+  const rawLines = code.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('#'));
+  const lines = rawLines.length > 0 ? rawLines : ['# No active code yet. Write functions or variables in the editor!'];
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
 
   // Derive memory variables based on lines stepped through
@@ -36,15 +37,33 @@ export const VisualCodeStepper: React.FC<VisualCodeStepperProps> = ({
         const fnName = line.split('def ')[1].split('(')[0];
         stack.push(`${fnName}()`);
         expl = `Defining function "${fnName}". The computer stores this recipe in memory for later.`;
+      } else if (line.startsWith('for ')) {
+        expl = `Initiating "for" loop: ${line}. The computer iterates over the collection element-by-element.`;
+      } else if (line.includes('.append(')) {
+        const varName = line.split('.append(')[0].trim();
+        const itemVal = line.split('.append(')[1].replace(/\);?$/, '').trim();
+        if (Array.isArray(vars[varName])) {
+          vars[varName] = [...vars[varName], itemVal.replace(/['"]/g, '')];
+          expl = `Appended "${itemVal}" to list "${varName}". List now contains ${vars[varName].length} items!`;
+        } else {
+          expl = `Appending item to list "${varName}".`;
+        }
       } else if (line.includes('=') && !line.includes('==') && !line.startsWith('return')) {
         const [k, v] = line.split('=').map(s => s.trim());
         let parsedVal: any = v;
         if (!isNaN(Number(v))) parsedVal = Number(v);
         else if (v.startsWith('"') || v.startsWith("'")) parsedVal = v.replace(/['"]/g, '');
+        else if (v.startsWith('[') && v.endsWith(']')) {
+          try {
+            parsedVal = v.replace(/['"]/g, '').replace(/\[|\]/g, '').split(',').map(s => s.trim()).filter(Boolean);
+          } catch {
+            parsedVal = 'List[]';
+          }
+        }
         else if (v in vars) parsedVal = vars[v];
         
         vars[k] = parsedVal;
-        expl = `Created variable jar "${k}" and stored value "${parsedVal}" inside it!`;
+        expl = `Created variable jar "${k}" and stored value "${Array.isArray(parsedVal) ? JSON.stringify(parsedVal) : parsedVal}" inside it!`;
       } else if (line.startsWith('if ')) {
         expl = `Evaluating condition "${line.replace('if ', '')}". The computer checks if this statement is True or False.`;
       } else if (line.startsWith('return ')) {

@@ -127,6 +127,78 @@ Server: BootForge/2.0
   "active_goroutines": 142,
   "memory_alloc_mb": 64.8
 }`;
+    } else if (baseCmd.startsWith('grep')) {
+      const parts = baseCmd.split(/\s+/);
+      // Syntax: grep <term> <file> or grep -i <term> <file>
+      let isCaseInsensitive = false;
+      let term = '';
+      let fileName = '';
+
+      if (parts[1] === '-i') {
+        isCaseInsensitive = true;
+        term = (parts[2] || '').replace(/['"]/g, '');
+        fileName = parts[3] || '';
+      } else {
+        term = (parts[1] || '').replace(/['"]/g, '');
+        fileName = parts[2] || '';
+      }
+
+      if (!term || !fileName) {
+        output = 'usage: grep [-i] <pattern> <file>';
+        isError = true;
+      } else if (!fileSystem[fileName]) {
+        output = `grep: ${fileName}: No such file or directory`;
+        isError = true;
+      } else {
+        const lines = fileSystem[fileName].split('\n');
+        const matched = lines.filter(l => 
+          isCaseInsensitive ? l.toLowerCase().includes(term.toLowerCase()) : l.includes(term)
+        );
+        output = matched.length > 0 ? matched.join('\n') : '';
+      }
+    } else if (baseCmd.startsWith('head')) {
+      const parts = baseCmd.split(/\s+/);
+      let count = 5;
+      let fileName = '';
+      if (parts[1] === '-n' && parts[2]) {
+        count = parseInt(parts[2], 10) || 5;
+        fileName = parts[3] || '';
+      } else {
+        fileName = parts[1] || '';
+      }
+
+      if (!fileName || !fileSystem[fileName]) {
+        output = `head: ${fileName || 'missing file'}: No such file or directory`;
+        isError = true;
+      } else {
+        output = fileSystem[fileName].split('\n').slice(0, count).join('\n');
+      }
+    } else if (baseCmd.startsWith('tail')) {
+      const parts = baseCmd.split(/\s+/);
+      let count = 5;
+      let fileName = '';
+      if (parts[1] === '-n' && parts[2]) {
+        count = parseInt(parts[2], 10) || 5;
+        fileName = parts[3] || '';
+      } else {
+        fileName = parts[1] || '';
+      }
+
+      if (!fileName || !fileSystem[fileName]) {
+        output = `tail: ${fileName || 'missing file'}: No such file or directory`;
+        isError = true;
+      } else {
+        const lines = fileSystem[fileName].split('\n');
+        output = lines.slice(Math.max(0, lines.length - count)).join('\n');
+      }
+    } else if (baseCmd.startsWith('echo')) {
+      const text = baseCmd.replace(/^echo\s*/, '').replace(/['"]/g, '');
+      if (text === '$PORT') output = '8080';
+      else if (text === '$USER') output = 'adventurer';
+      else if (text === '$ENV' || text === '$ENVIRONMENT') output = 'production';
+      else output = text;
+    } else if (baseCmd === 'history') {
+      output = commandHistory.map((cmd, i) => `  ${i + 1}  ${cmd}`).join('\n') || 'No commands in history yet.';
     } else if (baseCmd.startsWith('cat')) {
       const fileName = baseCmd.replace('cat', '').trim();
       let fileContent = fileSystem[fileName];

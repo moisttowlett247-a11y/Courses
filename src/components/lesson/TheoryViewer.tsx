@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { LessonContent } from '../../types/curriculum';
 import { jargonDictionary, JargonTerm } from '../../data/jargonData';
-import { BookOpen, CheckCircle2, HelpCircle, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp, BookA, X, AlertTriangle, Lightbulb, Code2 } from 'lucide-react';
+import { BookOpen, CheckCircle2, HelpCircle, Eye, EyeOff, Sparkles, ChevronDown, ChevronUp, BookA, X, AlertTriangle, Lightbulb, Code2, Volume2, VolumeX } from 'lucide-react';
 import { playSound } from '../../utils/soundEffects';
+import { speechNarrator } from '../../utils/speechNarrator';
 
 interface TheoryViewerProps {
   lesson: LessonContent;
@@ -27,9 +28,12 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
   const [selectedQuizOption, setSelectedQuizOption] = useState<number | null>(null);
   const [quizAnswered, setQuizAnswered] = useState(false);
   const [checkedInstructions, setCheckedInstructions] = useState<number[]>([]);
+  const [isNarrating, setIsNarrating] = useState(false);
 
   // Automatically hide solutions and breakdowns when switching lessons
   useEffect(() => {
+    speechNarrator.stop();
+    setIsNarrating(false);
     setShowSolution(false);
     setConfirmReveal(false);
     setShowBreakdown(false);
@@ -37,6 +41,26 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
     setQuizAnswered(false);
     setCheckedInstructions([]);
   }, [lesson.id]);
+
+  useEffect(() => {
+    return () => {
+      speechNarrator.stop();
+    };
+  }, []);
+
+  const toggleNarration = () => {
+    playSound('key');
+    if (isNarrating) {
+      speechNarrator.stop();
+      setIsNarrating(false);
+    } else {
+      const textToRead = `${lesson.title}. ${lesson.eli5Summary ? 'Analogy: ' + lesson.eli5Summary + '.' : ''} Mission: ${lesson.instructions.join('. ')}`;
+      setIsNarrating(true);
+      speechNarrator.speak(textToRead, () => {
+        setIsNarrating(false);
+      });
+    }
+  };
 
   const toggleInstruction = (idx: number) => {
     playSound('key');
@@ -80,9 +104,25 @@ export const TheoryViewer: React.FC<TheoryViewerProps> = ({
           <span className="text-amber-400 font-mono tabular-nums">+{lesson.xpReward} XP</span>
         </div>
 
-        <h1 className="text-xl font-bold tracking-tight text-white">
-          {lesson.title}
-        </h1>
+        <div className="flex items-center justify-between gap-2 mt-1">
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            {lesson.title}
+          </h1>
+
+          {/* Audio Narration Toggle */}
+          <button
+            onClick={toggleNarration}
+            title={isNarrating ? "Stop voice narration" : "Listen to lesson read aloud with text-to-speech"}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
+              isNarrating
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse'
+                : 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
+            }`}
+          >
+            {isNarrating ? <VolumeX className="h-3.5 w-3.5 text-amber-400" /> : <Volume2 className="h-3.5 w-3.5 text-slate-400" />}
+            <span className="hidden sm:inline">{isNarrating ? 'Pause Audio' : 'Listen'}</span>
+          </button>
+        </div>
 
         {/* Jargon Dictionary Toolbar */}
         <div className="mt-2.5 flex items-center justify-between gap-2 p-2.5 rounded-lg border border-slate-800 bg-slate-900/50">

@@ -588,6 +588,7 @@ export default function App() {
           currentCode: code
         }}
         initialDiagnoseError={aiDiagnoseMessage}
+        lastTestResults={testResults}
         onClearDiagnoseError={() => setAiDiagnoseMessage(null)}
         onApplyGeneratedQuest={handleApplyGeneratedQuest}
       />
