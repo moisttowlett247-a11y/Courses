@@ -18,7 +18,8 @@ import {
   Menu,
   X,
   ShieldCheck,
-  Sword
+  Sword,
+  GraduationCap
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -104,7 +105,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onNavigate('certifications')}
           className={`hover:text-amber-400 transition-colors flex items-center gap-1.5 ${currentView === 'certifications' ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5' : ''}`}
         >
-          <span>Certifications</span>
+          <GraduationCap className="h-4 w-4" />
+          <span>Degrees & Certs</span>
           {userStats.earnedCertificates && userStats.earnedCertificates.length > 0 && (
             <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold">
               {userStats.earnedCertificates.length}
@@ -341,8 +343,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}
             >
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span>Certifications</span>
+              <GraduationCap className="h-4 w-4 text-amber-400 shrink-0" />
+              <span>Degrees & Certifications</span>
             </button>
 
             <button

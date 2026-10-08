@@ -433,7 +433,7 @@ const virtualFs: Record<string, string> = {
 [2026-10-06 12:00:11] ERROR DeadlockDetected: transaction 891 aborted by deadlock detector
 [2026-10-06 12:00:15] ERROR OutOfMemory: worker thread 4 killed by OOM killer
 [2026-10-06 12:00:18] INFO  Graceful recovery initiated on worker thread 4`,
-  'config.yaml': `server:\n  port: 8080\n  environment: production`,
+  'config.yaml': `server:\n  port: 8080\n  environment: production\ndatabase:\n  host: postgres.internal\n  max_connections: 50`,
   'access.log': `127.0.0.1 - GET /index.html 200\n10.0.0.4 - GET /api/v1/auth 404\n10.0.0.5 - GET /missing 404`
 };
 
@@ -568,6 +568,25 @@ export async function runInteractiveCode(
                 return \`RateLimiter mismatch: r1=\${r1}, r2=\${r2}, r3=\${r3}, r4=\${r4}\`;
               }
               return 'Class RateLimiter not found';
+            `;
+            const runnerFn = new Function('mockConsole', runnerBody);
+            actual = runnerFn(mockConsole);
+          }
+          // Special Class Suite: Adventurer (Intro to OOP)
+          else if (tc.id === 'beg-cls1' || tc.name.toLowerCase().includes('adventurer')) {
+            const runnerBody = `
+              ${pyRuntime}
+              ${jsCode}
+              if (typeof Adventurer === 'function') {
+                const adv = new Adventurer('Boots', 100);
+                const r1 = adv.take_damage(30);
+                const r2 = adv.take_damage(90);
+                if (adv.name === 'Boots' && r1 === 70 && r2 === 0) {
+                  return 'Adventurer class verified';
+                }
+                return \`Adventurer mismatch: r1=\${r1}, r2=\${r2}\`;
+              }
+              return 'Class Adventurer not found';
             `;
             const runnerFn = new Function('mockConsole', runnerBody);
             actual = runnerFn(mockConsole);

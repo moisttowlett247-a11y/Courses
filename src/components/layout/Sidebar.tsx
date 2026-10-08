@@ -113,6 +113,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             Hard
           </button>
         </div>
+
+        {/* Academic Degree & Credentials Quick Access */}
+        {onNavigateToCertifications && (
+          <div className="pt-1 flex items-center justify-between text-xs">
+            <span className="text-[10px] text-slate-400 font-mono">120-Credit B.S. Pathway</span>
+            <button
+              onClick={onNavigateToCertifications}
+              className="text-[10px] text-amber-300 hover:text-amber-200 font-bold bg-amber-500/15 hover:bg-amber-500/25 px-2 py-0.5 rounded border border-amber-500/30 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <span>🎓 Degree Audit & Certs</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tracks & Lessons List */}

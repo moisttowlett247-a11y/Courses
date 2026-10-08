@@ -24,6 +24,19 @@ export interface QuickCheck {
   explanation: string;
 }
 
+export interface AcademicCredit {
+  courseCode: string;
+  courseName: string;
+  creditUnits: number;
+  competencyDomain: string;
+}
+
+export interface CertAlignment {
+  credentialTitle: string;
+  examDomain: string;
+  objective: string;
+}
+
 export interface LessonContent {
   id: string;
   trackId: string;
@@ -47,6 +60,8 @@ export interface LessonContent {
   codeBreakdown?: LineBreakdown[];
   commonMistakes?: string[];
   quickCheckQuiz?: QuickCheck;
+  academicCredit?: AcademicCredit;
+  certificationAlignment?: CertAlignment;
 }
 
 export interface Course {
@@ -281,3 +296,95 @@ export interface UserStats {
     gemReward: number;
   }[];
 }
+
+// ==========================================
+// ACADEMIC DEGREE & CERT STUDY GUIDE TYPES
+// ==========================================
+
+export interface AcademicCourse {
+  code: string;
+  title: string;
+  credits: number;
+  year: 'Freshman' | 'Sophomore' | 'Junior' | 'Senior';
+  semester: 'Fall' | 'Spring';
+  description: string;
+  prerequisites: string[];
+  learningOutcomes: string[];
+  recommendedReadings: string[];
+  mappedTrackId: string;
+  mappedLessonIds: string[];
+  accreditationStandard: string;
+}
+
+export interface AcademicSemester {
+  id: string;
+  name: string;
+  yearNumber: number;
+  semesterNumber: number;
+  credits: number;
+  courses: AcademicCourse[];
+}
+
+export interface DegreeProgram {
+  id: string;
+  title: string;
+  degreeType: string;
+  institution: string;
+  totalCredits: number;
+  accreditation: string;
+  description: string;
+  semesters: AcademicSemester[];
+  graduationRequirements: string[];
+}
+
+export interface TranscriptEntry {
+  courseCode: string;
+  title: string;
+  credits: number;
+  grade: string;
+  gradePoints: number;
+  status: 'Completed' | 'In Progress' | 'Not Started';
+  semesterName: string;
+}
+
+export interface AcademicTranscript {
+  studentName: string;
+  studentId: string;
+  institution: string;
+  degreeTitle: string;
+  status: 'Conferred' | 'Active - Matriculated';
+  conferralDate?: string;
+  cumulativeGpa: number;
+  totalCreditsEarned: number;
+  totalCreditsRequired: number;
+  academicStanding: string;
+  honors?: string;
+  verificationHash: string;
+  entries: TranscriptEntry[];
+}
+
+export interface CertStudyGuide {
+  examId: string;
+  title: string;
+  credentialTitle: string;
+  examDurationMinutes: number;
+  totalQuestions: number;
+  passingScore: number;
+  domains: {
+    name: string;
+    weight: number;
+    coreObjectives: string[];
+    examTips: string;
+  }[];
+  cramNotes: {
+    topic: string;
+    summary: string;
+    codeSnippet?: string;
+  }[];
+  vendorEquivalents: {
+    provider: string;
+    certName: string;
+    overlap: string;
+  }[];
+}
+
