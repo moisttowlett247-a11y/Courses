@@ -33,6 +33,9 @@ import { BugChallengesView } from './components/practice/BugChallengesView';
 import { FlashcardsView } from './components/practice/FlashcardsView';
 import { PortfolioProjectsView } from './components/practice/PortfolioProjectsView';
 import { MockInterviewView } from './components/practice/MockInterviewView';
+import { RosettaStoneView } from './components/practice/RosettaStoneView';
+import { SpeedDrillsView } from './components/practice/SpeedDrillsView';
+import { ErrorDecoderView } from './components/practice/ErrorDecoderView';
 import { GuildsLeaderboardView } from './components/community/GuildsLeaderboardView';
 import { VisualCodeStepper } from './components/debugger/VisualCodeStepper';
 import { JargonModal } from './components/layout/JargonModal';
@@ -544,6 +547,18 @@ export default function App() {
 
         {currentView === 'interview' && (
           <MockInterviewView />
+        )}
+
+        {currentView === 'rosetta-stone' && (
+          <RosettaStoneView />
+        )}
+
+        {currentView === 'speed-drills' && (
+          <SpeedDrillsView />
+        )}
+
+        {currentView === 'error-decoder' && (
+          <ErrorDecoderView />
         )}
 
         {currentView === 'guilds' && (

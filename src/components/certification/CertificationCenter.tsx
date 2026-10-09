@@ -6,7 +6,7 @@ import {
   Award, CheckCircle2, AlertCircle, Clock, Sparkles, Trophy, ArrowRight, ArrowLeft, 
   RefreshCw, Printer, ShieldCheck, HelpCircle, GraduationCap, FileText, BookOpen, 
   Layers, ExternalLink, ChevronDown, ChevronUp, Star, BadgeCheck, Compass, BookA, 
-  Cpu, Database, Terminal, Check, X
+  Cpu, Database, Terminal, Check, X, Target, Lightbulb, Zap
 } from 'lucide-react';
 import { playSound } from '../../utils/soundEffects';
 import confetti from 'canvas-confetti';
@@ -24,8 +24,8 @@ export const CertificationCenter: React.FC<CertificationCenterProps> = ({
   onUpdateStudentName,
   onNavigateToTrack
 }) => {
-  // Navigation tabs: 'degree' | 'exams' | 'study-guides' | 'industry-mapping' | 'my-diplomas'
-  const [activeHubTab, setActiveHubTab] = useState<'degree' | 'exams' | 'study-guides' | 'industry-mapping' | 'my-diplomas'>('degree');
+  // Navigation tabs: 'beginner-guide' | 'degree' | 'exams' | 'study-guides' | 'industry-mapping' | 'my-diplomas'
+  const [activeHubTab, setActiveHubTab] = useState<'beginner-guide' | 'degree' | 'exams' | 'study-guides' | 'industry-mapping' | 'my-diplomas'>('degree');
   
   // Exam simulator state
   const [selectedExam, setSelectedExam] = useState<CertificationExam | null>(null);
@@ -574,6 +574,18 @@ export const CertificationCenter: React.FC<CertificationCenterProps> = ({
             {/* Navigation Tabs Bar */}
             <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-850">
               <button
+                onClick={() => setActiveHubTab('beginner-guide')}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  activeHubTab === 'beginner-guide'
+                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                    : 'bg-emerald-950/30 text-emerald-300 hover:text-white hover:bg-emerald-900/40 border border-emerald-500/30'
+                }`}
+              >
+                <Sparkles className="h-4 w-4 text-emerald-400" />
+                <span>Zero-Knowledge College & Cert Guide</span>
+              </button>
+
+              <button
                 onClick={() => setActiveHubTab('degree')}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeHubTab === 'degree'
@@ -634,6 +646,372 @@ export const CertificationCenter: React.FC<CertificationCenterProps> = ({
               </button>
             </div>
           </div>
+
+          {/* ========================================================================= */}
+          {/* TAB 0: ZERO-KNOWLEDGE BEGINNER GUIDE & COLLEGE/CERT ADVANTAGE BLUEPRINT */}
+          {/* ========================================================================= */}
+          {activeHubTab === 'beginner-guide' && (
+            <div className="space-y-6">
+              {/* Hero Callout */}
+              <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-950 p-6 md:p-8 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold font-mono">
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Beginner Strategy: Zero Experience to Academic & Industry Honors</span>
+                </div>
+
+                <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                  "I Have Zero Knowledge About Coding. Can I Use This to Gain an Advantage?"
+                </h2>
+
+                <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-4xl">
+                  <strong className="text-emerald-400 font-semibold">Yes — in fact, starting with zero experience is your biggest advantage.</strong> You have no bad habits or confusing paradigms to unlearn. BootForge was engineered specifically to take absolute beginners and build an intuitive, crystal-clear mental model of computing before introducing academic jargon.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3">
+                  <div className="p-4 rounded-xl border border-emerald-500/20 bg-slate-950/60 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase font-mono">
+                      <Target className="h-4 w-4" /> 1. College CS Course Advantage
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      University CS 101 courses have a notorious <strong>30–40% dropout rate</strong> because professors move fast through lecture slides. By completing BootForge beforehand, concepts like loops, variables, and recursion become second nature. You walk in ready to earn an <strong>A+</strong>.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-amber-500/20 bg-slate-950/60 space-y-2">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase font-mono">
+                      <Award className="h-4 w-4" /> 2. Industry Certificate Advantage
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Vendor exams (AWS, Google Cloud, Linux Foundation LFCS, PostgreSQL) test practical commands and architecture. BootForge trains your muscle memory with real simulated exam environments, domain breakdowns, and cheat sheets.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-sky-500/20 bg-slate-950/60 space-y-2">
+                    <div className="flex items-center gap-2 text-sky-400 font-bold text-xs uppercase font-mono">
+                      <Zap className="h-4 w-4" /> 3. Zero-Setup In-Browser Sandbox
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Beginners often quit because installing Python, Linux, compilers, and databases is frustrating. BootForge runs everything safely in your browser so you learn logic first without fighting installation errors.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* The 4 Unfair Advantages in a College Course */}
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-amber-400" />
+                  <span>Why BootForge Gives You an "Unfair Advantage" in Any College Course</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2.5">
+                    <span className="text-emerald-400 font-mono text-xs font-bold uppercase tracking-wider block">
+                      Feature: Line-by-Line Plain-English Breakdown
+                    </span>
+                    <h4 className="text-sm font-bold text-white">No More "Greek to Me" Syntax Shock</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      In college lectures, a professor writes a complex function on a whiteboard and expects you to understand every symbol. In BootForge, every lesson includes a dedicated <strong>"Line-by-Line Breakdown"</strong> that translates every single colon, parenthesis, and keyword into plain everyday English so you build rock-solid intuition.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2.5">
+                    <span className="text-amber-400 font-mono text-xs font-bold uppercase tracking-wider block">
+                      Feature: ELI5 ("Explain Like I'm 5") Analogies
+                    </span>
+                    <h4 className="text-sm font-bold text-white">Visual Real-World Mental Models</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Instead of dry academic definitions like <em>"a variable is an allocated memory reference,"</em> BootForge explains variables as labeled shoe boxes, loops as restaurant conveyor belts, and functions as reusable cooking recipes. When exam day arrives, these intuitive models prevent freeze-ups.
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2.5">
+                    <span className="text-sky-400 font-mono text-xs font-bold uppercase tracking-wider block">
+                      Feature: Instant Intelligent Diagnostic Feedback
+                    </span>
+                    <h4 className="text-sm font-bold text-white">Master Debugging Before Your First Lab Assignment</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      The biggest cause of college homework stress is getting stuck on a syntax or indentation error for 4 hours at 2 AM. BootForge checks your code immediately, highlights the exact character that needs fixing, and provides progressive hints. You will arrive at college already skilled at debugging!
+                    </p>
+                  </div>
+
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/60 space-y-2.5">
+                    <span className="text-purple-400 font-mono text-xs font-bold uppercase tracking-wider block">
+                      Feature: Verified Credential Transcripts
+                    </span>
+                    <h4 className="text-sm font-bold text-white">Prior Learning Portfolio & Career Proof</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Every completed module and exam in BootForge awards verifiable credentials, course credits, and GPA scores that you can print as an <strong>Official Academic Transcript</strong> or <strong>Professional Certificate</strong> to present to college admissions advisors, employers, or internship interviewers.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step-by-Step Curriculum Roadmap for Zero-Knowledge Learners */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <Compass className="h-4 w-4 text-emerald-400" />
+                    <span>Your 5-Step Roadmap: From Day 0 to College A+ & Certified Professional</span>
+                  </h3>
+                  <span className="text-xs font-mono text-slate-400">Estimated Pace: 30-45 mins/day</span>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Step 1 */}
+                  <div className="p-4 rounded-xl border border-emerald-500/30 bg-slate-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                        01
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white">Track 1: Zero-to-One Foundations (Python/JS)</h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 font-semibold">
+                            College CS 101 / AP CS A
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Master variables, types, logic, conditionals, and functions with zero prior experience. Prepares you to easily ace any collegiate introduction to programming.
+                        </p>
+                        <div className="text-[11px] text-emerald-400 font-mono">
+                          Target Certificate: Certified Python Backend Associate (Score 75%+)
+                        </div>
+                      </div>
+                    </div>
+                    {onNavigateToTrack && (
+                      <button
+                        onClick={() => onNavigateToTrack('track-zero-to-one')}
+                        className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Start Track 1</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="p-4 rounded-xl border border-sky-500/30 bg-slate-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/40 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                        02
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white">Track 2: Data Structures & Algorithmic Complexity</h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/80 text-sky-300 border border-sky-500/30 font-semibold">
+                            College CS 201 (Weed-Out Course)
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Arrays, Linked Lists, Stacks, Queues, Hash Tables, and Big-O notation. This is the hardest course in standard university curricula; mastering it here gives you complete confidence.
+                        </p>
+                        <div className="text-[11px] text-sky-400 font-mono">
+                          Target Credential: Certified Data Structures & Algorithms Specialist
+                        </div>
+                      </div>
+                    </div>
+                    {onNavigateToTrack && (
+                      <button
+                        onClick={() => onNavigateToTrack('track-dsa')}
+                        className="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Start Track 2</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="p-4 rounded-xl border border-amber-500/30 bg-slate-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                        03
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white">Track 3: Linux & Systems Administration</h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/30 font-semibold">
+                            College CS 305 / Operating Systems
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Bash commands, POSIX filesystem, process management, SSH, and file permissions. Eliminates the terminal intimidation that causes students to struggle in systems courses.
+                        </p>
+                        <div className="text-[11px] text-amber-400 font-mono">
+                          Target Certificate: Certified Linux & Cloud Systems Administrator (LFCS Aligned)
+                        </div>
+                      </div>
+                    </div>
+                    {onNavigateToTrack && (
+                      <button
+                        onClick={() => onNavigateToTrack('track-linux')}
+                        className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Start Track 3</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="p-4 rounded-xl border border-indigo-500/30 bg-slate-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                        04
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white">Track 4: Relational Databases & SQL</h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 font-semibold">
+                            College CS 310 / Database Management
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Relational architecture, SELECT queries, JOINs, B-Tree indexing, transactions, and normalization. Essential knowledge for both college exams and professional backend roles.
+                        </p>
+                        <div className="text-[11px] text-indigo-400 font-mono">
+                          Target Certificate: Certified SQL Database Specialist (PostgreSQL Aligned)
+                        </div>
+                      </div>
+                    </div>
+                    {onNavigateToTrack && (
+                      <button
+                        onClick={() => onNavigateToTrack('track-sql')}
+                        className="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-slate-950 text-xs font-bold transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Start Track 4</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Step 5 */}
+                  <div className="p-4 rounded-xl border border-teal-500/30 bg-slate-900/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-teal-500/20 text-teal-400 border border-teal-500/40 flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                        05
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-white">Track 5: High-Concurrency & Microservices with Go</h4>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-teal-950/80 text-teal-300 border border-teal-500/30 font-semibold">
+                            College CS 401 / Distributed Systems
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          Goroutines, buffered channels, mutexes, HTTP servers, and microservice APIs. Puts you at the cutting edge of modern cloud computing and AWS/GCP engineering.
+                        </p>
+                        <div className="text-[11px] text-teal-400 font-mono">
+                          Target Certificate: Certified Go Concurrency Engineer & Cloud Backend
+                        </div>
+                      </div>
+                    </div>
+                    {onNavigateToTrack && (
+                      <button
+                        onClick={() => onNavigateToTrack('track-golang')}
+                        className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold transition-colors shrink-0 cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span>Start Track 5</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* College Course Equivalency Comparison Table */}
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-amber-400" />
+                  <span>College Course Syllabus Comparison: BootForge vs. University Lecture</span>
+                </h3>
+
+                <div className="border border-slate-800 rounded-xl overflow-x-auto bg-slate-900/50">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] border-b border-slate-800">
+                      <tr>
+                        <th className="py-3 px-4">College Course</th>
+                        <th className="py-3 px-4">Why College Students Struggle</th>
+                        <th className="py-3 px-4">BootForge Equivalent Module</th>
+                        <th className="py-3 px-4">Your Advantage When Enrolled</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 font-sans text-slate-300">
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-bold text-amber-300 font-mono">CS 101: Intro to Programming</td>
+                        <td className="py-3 px-4 text-slate-400">Syntax errors, confusing IDE setups, and fast lecture slides with no line breakdown.</td>
+                        <td className="py-3 px-4 text-emerald-400 font-medium">Track 01: Zero-to-One Foundations</td>
+                        <td className="py-3 px-4 text-white font-medium">You write working code on Day 1. Lab homework takes 15 minutes instead of 6 hours.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-bold text-amber-300 font-mono">CS 201: Data Structures</td>
+                        <td className="py-3 px-4 text-slate-400">Abstract Big-O math proofs, linked list pointers, and recursive stack frames.</td>
+                        <td className="py-3 px-4 text-sky-400 font-medium">Track 02: Data Structures & Algorithms</td>
+                        <td className="py-3 px-4 text-white font-medium">You understand physical memory layouts, Big-O trade-offs, and pointer manipulation visually.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-bold text-amber-300 font-mono">CS 305: Operating Systems</td>
+                        <td className="py-3 px-4 text-slate-400">Terminal command terror, permission flags (chmod 755), and thread deadlocks.</td>
+                        <td className="py-3 px-4 text-amber-400 font-medium">Track 03: Linux & Systems Administration</td>
+                        <td className="py-3 px-4 text-white font-medium">Bash, pipes, grep, SSH, and file permissions are already second nature.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-bold text-amber-300 font-mono">CS 310: Database Systems</td>
+                        <td className="py-3 px-4 text-slate-400">Multi-table JOIN logic, slow query table scans, and ACID transaction isolation.</td>
+                        <td className="py-3 px-4 text-indigo-400 font-medium">Track 04: Relational Databases & SQL</td>
+                        <td className="py-3 px-4 text-white font-medium">You know how B-Tree indexes work under the hood and write clean SQL queries effortlessly.</td>
+                      </tr>
+                      <tr className="hover:bg-slate-800/30 transition-colors">
+                        <td className="py-3 px-4 font-bold text-amber-300 font-mono">CS 401: Distributed Systems</td>
+                        <td className="py-3 px-4 text-slate-400">Race conditions, channel deadlocks, and network latency anomalies.</td>
+                        <td className="py-3 px-4 text-teal-400 font-medium">Track 05: Concurrency with Go</td>
+                        <td className="py-3 px-4 text-white font-medium">You build asynchronous concurrent services with CSP channel patterns ahead of graduation.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Beginner FAQ */}
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <HelpCircle className="h-4 w-4 text-emerald-400" />
+                  <span>Frequently Asked Questions for Absolute Beginners</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 space-y-1.5">
+                    <h4 className="text-xs font-bold text-amber-300">"Do I need to be good at math to code?"</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      No! 95% of software engineering is about structured logic, clear recipes, and organizational problem solving — not advanced calculus. If you can follow a recipe or organize folders, you can excel at coding.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 space-y-1.5">
+                    <h4 className="text-xs font-bold text-amber-300">"Can I put BootForge certificates on my resume or LinkedIn?"</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Yes! Every certificate you earn features a unique cryptographic verification ID, your official student name, score, honors distinction, and a printable PDF format suitable for resumes and portfolio reviews.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 space-y-1.5">
+                    <h4 className="text-xs font-bold text-amber-300">"How does this help if I want a full college degree?"</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      BootForge is structured against a full 120-credit B.S. degree curriculum (ABET & ACM/IEEE compliant). You can print your complete collegiate transcript to petition for credit-by-exam or college prior-learning assessment (PLA).
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 space-y-1.5">
+                    <h4 className="text-xs font-bold text-amber-300">"What if I get stuck on a coding lesson?"</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      BootForge includes built-in hint systems, line-by-line breakdowns, and syntax solution reveal toggles. You are never left abandoned on an error screen.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ========================================================================= */}
           {/* TAB 1: BACHELOR OF SCIENCE DEGREE AUDIT & CURRICULUM ROADMAP */}

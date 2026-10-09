@@ -19,7 +19,10 @@ import {
   X,
   ShieldCheck,
   Sword,
-  GraduationCap
+  GraduationCap,
+  Languages,
+  Keyboard,
+  ShieldAlert
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -190,6 +193,47 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <MessageSquare className="h-4 w-4 text-sky-400" />
                 <span>Mock Interview</span>
+              </button>
+
+              <div className="my-1 border-t border-slate-800/80" />
+
+              <button
+                onClick={() => {
+                  onNavigate('rosetta-stone');
+                  setPracticeOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                  currentView === 'rosetta-stone' ? 'bg-amber-500/10 text-amber-300 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Languages className="h-4 w-4 text-amber-400" />
+                <span>Rosetta Stone</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  onNavigate('speed-drills');
+                  setPracticeOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                  currentView === 'speed-drills' ? 'bg-amber-500/10 text-amber-300 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Keyboard className="h-4 w-4 text-cyan-400" />
+                <span>Typing Speed Drills</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  onNavigate('error-decoder');
+                  setPracticeOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                  currentView === 'error-decoder' ? 'bg-amber-500/10 text-amber-300 font-semibold' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <ShieldAlert className="h-4 w-4 text-rose-400" />
+                <span>Error Decoder</span>
               </button>
             </div>
           )}
@@ -420,6 +464,42 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <MessageSquare className="h-4 w-4 text-sky-400 shrink-0" />
               <span>Mock Interview</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('rosetta-stone')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'rosetta-stone'
+                  ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Languages className="h-4 w-4 text-amber-400 shrink-0" />
+              <span>Rosetta Stone</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('speed-drills')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'speed-drills'
+                  ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <Keyboard className="h-4 w-4 text-cyan-400 shrink-0" />
+              <span>Speed Drills</span>
+            </button>
+
+            <button
+              onClick={() => handleMobileNav('error-decoder')}
+              className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors ${
+                currentView === 'error-decoder'
+                  ? 'bg-rose-500/15 border-rose-500/40 text-rose-300 font-semibold'
+                  : 'bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+              }`}
+            >
+              <ShieldAlert className="h-4 w-4 text-rose-400 shrink-0" />
+              <span>Error Decoder</span>
             </button>
           </div>
 
