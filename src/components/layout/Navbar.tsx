@@ -132,7 +132,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               setLabsOpen(false);
             }}
             className={`flex items-center gap-1 hover:text-amber-400 transition-colors ${
-              ['bug-bounty', 'flashcards', 'portfolio', 'interview'].includes(currentView)
+              ['bug-bounty', 'flashcards', 'portfolio', 'interview', 'rosetta-stone', 'speed-drills', 'error-decoder'].includes(currentView)
                 ? 'text-amber-400 font-semibold border-b-2 border-amber-500 pb-0.5'
                 : ''
             }`}

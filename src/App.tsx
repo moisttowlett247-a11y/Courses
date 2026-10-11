@@ -123,6 +123,25 @@ export default function App() {
   const [isStepperOpen, setIsStepperOpen] = useState(false);
   const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [aiDiagnoseMessage, setAiDiagnoseMessage] = useState<string | null>(null);
+  const [aiAction, setAiAction] = useState<'diagnose' | 'explain' | 'hint' | 'chat'>('chat');
+
+  const handleOpenAiExplain = () => {
+    setAiAction('explain');
+    setAiDiagnoseMessage(null);
+    setIsArchmageAiOpen(true);
+  };
+
+  const handleOpenAiDiagnose = (err?: string) => {
+    setAiDiagnoseMessage(err || null);
+    setAiAction('diagnose');
+    setIsArchmageAiOpen(true);
+  };
+
+  const handleOpenAiHint = () => {
+    setAiAction('hint');
+    setAiDiagnoseMessage(null);
+    setIsArchmageAiOpen(true);
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -446,7 +465,7 @@ export default function App() {
                       isCompleted={userStats.completedLessons.includes(selectedLesson.id)}
                       revealedHints={revealedHints}
                       onShowHint={(idx) => setRevealedHints(prev => [...prev, idx])}
-                      onOpenAIHint={() => setIsArchmageAiOpen(true)}
+                      onOpenAIHint={handleOpenAiHint}
                     />
                   </div>
                 )}
@@ -466,7 +485,12 @@ export default function App() {
                         language={selectedLesson.language}
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
-                        onAskAI={() => setIsArchmageAiOpen(true)}
+                        onAskAI={() => {
+                          setAiAction('chat');
+                          setAiDiagnoseMessage(null);
+                          setIsArchmageAiOpen(true);
+                        }}
+                        onExplainCode={handleOpenAiExplain}
                         onOpenStepper={() => setIsStepperOpen(true)}
                       />
                     </div>
@@ -476,10 +500,7 @@ export default function App() {
                       results={testResults}
                       isRunning={isRunning}
                       onRun={handleRunCode}
-                      onAskAIDiagnose={(err) => {
-                        setAiDiagnoseMessage(err);
-                        setIsArchmageAiOpen(true);
-                      }}
+                      onAskAIDiagnose={handleOpenAiDiagnose}
                     />
                   </div>
                 )}
@@ -595,6 +616,7 @@ export default function App() {
         onClose={() => {
           setIsArchmageAiOpen(false);
           setAiDiagnoseMessage(null);
+          setAiAction('chat');
         }}
         currentLessonContext={{
           title: selectedLesson.title,
@@ -603,6 +625,7 @@ export default function App() {
           currentCode: code
         }}
         initialDiagnoseError={aiDiagnoseMessage}
+        initialAction={aiAction}
         lastTestResults={testResults}
         onClearDiagnoseError={() => setAiDiagnoseMessage(null)}
         onApplyGeneratedQuest={handleApplyGeneratedQuest}

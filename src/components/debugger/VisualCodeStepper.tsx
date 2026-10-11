@@ -48,19 +48,49 @@ export const VisualCodeStepper: React.FC<VisualCodeStepperProps> = ({
         } else {
           expl = `Appending item to list "${varName}".`;
         }
-      } else if (line.includes('=') && !line.includes('==') && !line.startsWith('return')) {
-        const [k, v] = line.split('=').map(s => s.trim());
+      } else if (line.includes('=') && !line.includes('==') && !line.includes('!=') && !line.includes('<=') && !line.includes('>=') && !line.startsWith('return')) {
+        const parts = line.split('=');
+        const k = parts[0].trim();
+        const v = parts.slice(1).join('=').trim();
         let parsedVal: any = v;
-        if (!isNaN(Number(v))) parsedVal = Number(v);
-        else if (v.startsWith('"') || v.startsWith("'")) parsedVal = v.replace(/['"]/g, '');
-        else if (v.startsWith('[') && v.endsWith(']')) {
+
+        if (v === 'True' || v === 'true') {
+          parsedVal = true;
+        } else if (v === 'False' || v === 'false') {
+          parsedVal = false;
+        } else if (v === 'None' || v === 'null') {
+          parsedVal = null;
+        } else if (!isNaN(Number(v))) {
+          parsedVal = Number(v);
+        } else if (v.startsWith('"') || v.startsWith("'")) {
+          parsedVal = v.replace(/^['"]|['"]$/g, '');
+        } else if (v.startsWith('[') && v.endsWith(']')) {
           try {
-            parsedVal = v.replace(/['"]/g, '').replace(/\[|\]/g, '').split(',').map(s => s.trim()).filter(Boolean);
+            parsedVal = v.replace(/^\[|\]$/g, '').split(',').map(s => {
+              const item = s.trim().replace(/^['"]|['"]$/g, '');
+              return isNaN(Number(item)) ? item : Number(item);
+            }).filter(Boolean);
           } catch {
-            parsedVal = 'List[]';
+            parsedVal = [];
+          }
+        } else if (v in vars) {
+          parsedVal = vars[v];
+        } else if (/^[a-zA-Z0-9_\s\+\-\*\/]+$/.test(v)) {
+          // Attempt simple arithmetic evaluation using existing variables
+          try {
+            let expr = v;
+            for (const [varName, varVal] of Object.entries(vars)) {
+              if (typeof varVal === 'number') {
+                expr = expr.replace(new RegExp(`\\b${varName}\\b`, 'g'), String(varVal));
+              }
+            }
+            if (/^[0-9\s\+\-\*\/]+$/.test(expr)) {
+              parsedVal = Function(`'use strict'; return (${expr})`)();
+            }
+          } catch {
+            parsedVal = v;
           }
         }
-        else if (v in vars) parsedVal = vars[v];
         
         vars[k] = parsedVal;
         expl = `Created variable jar "${k}" and stored value "${Array.isArray(parsedVal) ? JSON.stringify(parsedVal) : parsedVal}" inside it!`;

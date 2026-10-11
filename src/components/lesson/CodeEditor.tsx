@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Copy, Check, Terminal, Sparkles, Code2, AlertCircle, Info } from 'lucide-react';
+import { Play, RotateCcw, Copy, Check, Terminal, Sparkles, Code2, AlertCircle, Info, Wand2, BookOpen } from 'lucide-react';
 import { playSound } from '../../utils/soundEffects';
 import { lintUserCode } from '../../utils/syntaxLinter';
 
@@ -13,6 +13,7 @@ interface CodeEditorProps {
   activeTab: 'code' | 'tests' | 'console';
   setActiveTab: (tab: 'code' | 'tests' | 'console') => void;
   onAskAI: () => void;
+  onExplainCode?: () => void;
   onOpenStepper?: () => void;
 }
 
@@ -26,6 +27,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   activeTab,
   setActiveTab,
   onAskAI,
+  onExplainCode,
   onOpenStepper
 }) => {
   const [copied, setCopied] = useState(false);
@@ -106,6 +108,17 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
 
+          {onExplainCode && (
+            <button
+              onClick={onExplainCode}
+              title="Ask Boots the Archmage AI to explain this code in plain English"
+              className="flex items-center gap-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-1 text-[11px] rounded transition-all active:scale-95 cursor-pointer font-medium shrink-0"
+            >
+              <Sparkles className="h-3 w-3 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">Explain</span>
+            </button>
+          )}
+
           {onOpenStepper && (
             <button
               onClick={onOpenStepper}
@@ -114,6 +127,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             >
               <Sparkles className="h-3 w-3 text-sky-400 shrink-0" />
               <span className="hidden xl:inline">Stepper</span>
+            </button>
+          )}
+
+          {onAskAI && (
+            <button
+              onClick={onAskAI}
+              title="Open Boots the Archmage AI Mentor"
+              className="p-1 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded transition-colors shrink-0"
+            >
+              <Wand2 className="h-3.5 w-3.5" />
             </button>
           )}
 
